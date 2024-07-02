@@ -1,0 +1,11 @@
+[CONTROLS]
+MoveUp = "w"
+MoveDown = "s"
+MoveLeft = "a"
+MoveRight = "d"
+FireWeapon = "LMB"
+ReloadWeapon = "r"
+
+[RENDERING]
+VSync = true
+Fullscreen = true
