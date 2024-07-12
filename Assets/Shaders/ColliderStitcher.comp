@@ -1,0 +1,34 @@
+#version 430
+
+
+/*
+
+This Compute Shader Is Used To Stitch The Coliders Into
+One Colider Image Using The Gpu
+
+*/
+
+
+
+layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+
+layout (binding = 0, rgba8) readonly uniform image2DArray inputImage;
+layout (binding = 1, rgba8) writeonly uniform image2D outputImage;
+
+uniform ivec2 imageSize;
+uniform ivec2 gridSize;
+
+void main() {
+    ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
+    if (pos.x >= gridSize.x || pos.y >= gridSize.y) return;
+
+    ivec2 cellPos = pos * imageSize;
+    vec4 color = imageLoad(inputImage, ivec3(pos, 0));
+
+    for (int y = 0; y < imageSize.y; ++y) {
+        for (int x = 0; x < imageSize.x; ++x) {
+            ivec2 pixelPos = cellPos + ivec2(x, y);
+            imageStore(outputImage, pixelPos, color);
+        }
+    }
+}
