@@ -1,5 +1,11 @@
 #version 450
 
+/*
+
+This Compute Shader Is Used To Stitch The Map Into
+One Image Using The Gpu For Rendering In The Game
+
+*/
 
 
 layout(local_size_x = 16, local_size_y = 16) in;
