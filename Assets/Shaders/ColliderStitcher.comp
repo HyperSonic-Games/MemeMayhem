@@ -3,7 +3,7 @@
 
 /*
 
-This Compute Shader Is Used To Stitch The Coliders Into
+This Compute Shader Is Used To Stitch The Colliders Into
 One Colider Image Using The Gpu
 
 */
