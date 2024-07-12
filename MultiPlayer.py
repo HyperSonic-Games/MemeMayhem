@@ -3,11 +3,11 @@ import threading
 
 # Class to represent a message with prefix, message name, IP, and data
 class Message:
-    def __init__(self, prefix, message_name, ip, data):
-        self.prefix = prefix
-        self.message_name = message_name
-        self.ip = ip
-        self.data = data
+    def __init__(self, Prefix, MessageName, Ip, Data):
+        self.prefix = Prefix
+        self.message_name = MessageName
+        self.ip = Ip
+        self.data = Data
     
     def __repr__(self):
         return [self.prefix, self.message_name, self.ip, self.data]

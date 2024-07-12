@@ -24,23 +24,29 @@ class Game:
             pygame.display.toggle_fullscreen()
         else:
             # If initialization fails, show an error popup and exit
-            Utils.PopupManager.Error("Error", "Pygame Display Surface Failed To Initialize")
+            Utils.PopupManager.Error("Error: Client", "Pygame Display Surface Failed To Initialize")
             pygame.quit()
             exit(1)
 
-    def render(self):
-        # Implement rendering logic common to all game elements
+    def GetRenderContext(self):
+        pass
+    
+    
+    # Renders The Map And The Rest Of The Clients
+    def Render(self):
         pass
 
 # Gui class inheriting from Game
 class Gui(Game):
     def __init__(self):
         super().__init__()
-        # Initialize pygame_gui or other GUI-related elements
+        # Initialize pygame_gui elements
 
-    def render(self):
-        super().render()
+    def Render(self):
+        self.RenferContext = super().GetRenderContext()
         # Implement additional GUI rendering logic specific to Gui class
+
+
 
 # Player class inheriting from Game
 class Player(Game):
@@ -48,9 +54,9 @@ class Player(Game):
         super().__init__()
         # Initialize player-specific attributes and logic
 
-    def render(self):
-        super().render()
-        # Implement additional rendering logic specific to Player class
+    def Render(self):
+        self.RenderContext = super().GetRenderContext()
+
 
 
 # Main entry point
@@ -70,9 +76,9 @@ if __name__ == "__main__":
                 running = False  # Exit the loop if the window is closed
 
         # Render core game elements, GUI elements, and player elements
-        game.render()
-        gui.render()
-        player.render()
+        game.Render()
+        gui.Render()
+        player.Render()
 
         pygame.display.flip()  # Update the display with the rendered frame
         clock.tick(60)  # Limit frame rate to 60 FPS
