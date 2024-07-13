@@ -9,26 +9,45 @@ One Colider Image Using The Gpu
 */
 
 
+// Define the work group size
+layout (local_size_x = 1, local_size_y = 1) in;
 
-layout (local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+// Input texture containing collider data
+layout (binding = 0, rgba8) readonly uniform image2DArray inputTexture;
 
-layout (binding = 0, rgba8) readonly uniform image2DArray inputImage;
-layout (binding = 1, rgba8) writeonly uniform image2D outputImage;
+// Output texture for the collider visual representation
+layout (binding = 1, rgba8) writeonly uniform image2D outputTexture;
 
+// Uniforms for image and grid sizes
 uniform ivec2 imageSize;
 uniform ivec2 gridSize;
 
+// Color mappings passed from the Python code
+uniform vec4 colorNone;
+uniform vec4 colorPlayer;
+uniform vec4 colorBullet;
+uniform vec4 colorPlayerAndBullet;
+
+// Mapping collider types to colors
+vec4 GetColorForCollider(int colliderType) {
+    if (colliderType == 0) return colorNone;
+    if (colliderType == 1) return colorPlayer;
+    if (colliderType == 2) return colorBullet;
+    if (colliderType == 3) return colorPlayerAndBullet;
+    return colorNone; // Default to none if unknown type
+}
+
 void main() {
     ivec2 pos = ivec2(gl_GlobalInvocationID.xy);
-    if (pos.x >= gridSize.x || pos.y >= gridSize.y) return;
 
-    ivec2 cellPos = pos * imageSize;
-    vec4 color = imageLoad(inputImage, ivec3(pos, 0));
+    // Determine which collider type is at the current position
+    ivec3 texelPos = ivec3(pos, 0);
+    ivec4 data = imageLoad(inputTexture, texelPos);
+    int colliderType = data.r;
 
-    for (int y = 0; y < imageSize.y; ++y) {
-        for (int x = 0; x < imageSize.x; ++x) {
-            ivec2 pixelPos = cellPos + ivec2(x, y);
-            imageStore(outputImage, pixelPos, color);
-        }
-    }
+    // Get the color for this collider type
+    vec4 color = GetColorForCollider(colliderType);
+
+    // Write the color to the output texture
+    imageStore(outputTexture, pos, color);
 }

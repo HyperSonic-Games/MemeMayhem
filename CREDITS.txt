@@ -1,0 +1,11 @@
+[Developers]
+Sebastian Yurchenko
+Everet Bradford
+Everet Morman
+
+
+[Assets]
+Gunner 
+
+[Sound]
+MainTheme: Prisoner by Karl Casey @ White Bat Audio 

@@ -3,212 +3,179 @@ import numpy as np
 import OpenGL.GL as gl
 from PIL import Image
 import Utils
-import os
+import re
 
 class MapLoader:
-    def __init__(self, pathToMapFile):
-        with open(pathToMapFile, 'r') as f:
-            self.MapData = f.read().strip().split('\n')
+    # Color mappings for colliders
+    COLOR_NONE = [0.0, 0.0, 0.0, 0.0]
+    COLOR_PLAYER = [1.0, 0.0, 0.0, 1.0]
+    COLOR_BULLET = [0.0, 1.0, 0.0, 1.0]
+    COLOR_PLAYER_AND_BULLET = [0.0, 0.0, 1.0, 1.0]
 
-        self.GridSize = self.GetGridSize()
-        self.ImageSize = (16, 16)
-        self.NumImages = self.GridSize[0] * self.GridSize[1]
-        self.ImagePaths = self._GetImagePaths()
-        self.ImagesData = {name: self._LoadTexture(path) for name, path in self.ImagePaths.items()}
-        self.Program = None
-        self.InputTexture = None
-        self.OutputTexture = None
+    # Color mappings for triggers
+    TRIGGER_COLOR_NONE = [0.0, 0.0, 0.0, 0.0]
+    TRIGGER_COLOR_PLAYER_SPAWN = [1.0, 1.0, 0.0, 1.0]
+    TRIGGER_COLOR_HP_LARGE_SPAWN = [1.0, 0.0, 1.0, 1.0]
+    TRIGGER_COLOR_AMMO_LARGE_SPAWN = [0.0, 1.0, 1.0, 1.0]
+    TRIGGER_COLOR_AMMO_SMALL_SPAWN = [1.0, 0.5, 0.0, 1.0]
+    TRIGGER_COLOR_HP_SMALL_SPAWN = [0.5, 0.0, 1.0, 1.0]
 
-    def __del__(self):
-        self._Cleanup()
+    def __init__(self):
+        self.image_size = (16, 16)
+        self.grid_size = None
+        self.num_images = None
+        self.textures = {}
+        self.colliders = []
+        self.triggers = []
 
-    def GetGridSize(self):
-        return len(self.MapData), len(self.MapData[0].split(', '))
+    def LoadMap(self, path_to_map_file):
+        with open(path_to_map_file, 'r') as f:
+            lines = f.read().strip().split('\n')
 
-    def _GetImagePaths(self):
-        imageSet = set()
-        for row in self.MapData:
-            for item in row.split(', '):
-                imageSet.add(item)
+        self.textures, self.colliders, self.triggers = self._ParseMapFile(lines)
+        self.grid_size = (len(self.colliders), len(self.colliders[0]))
+        self.num_images = self.grid_size[0] * self.grid_size[1]
 
-        return {image: f"Assets/Images/Map/{image}.png" for image in imageSet}
+    def _ParseMapFile(self, lines):
+        textures = []
+        colliders = []
+        triggers = []
 
-    def _LoadTexture(self, filePath):
-        if not os.path.exists(filePath):
-            Utils.PopupManager().Error("Error: MapLib", f"Texture file not found: {filePath}")
-            return None
+        current_section = None
+        for line in lines:
+            line = line.strip()
+            if line == '[Textures]':
+                current_section = 'textures'
+                continue
+            elif line == '[Colliders]':
+                current_section = 'colliders'
+                continue
+            elif line == '[Triggers]':
+                current_section = 'triggers'
+                continue
 
-        image = Image.open(filePath)
-        imageData = np.array(image, dtype=np.uint8)
-        return imageData
+            if current_section == 'textures':
+                textures.append(line)
+            elif current_section == 'colliders':
+                colliders.append(list(map(int, line.split(', '))))
+            elif current_section == 'triggers':
+                triggers.append(list(map(int, line.split(', '))))
 
-    def _ReadComputeShader(self, filePath):
-        with open(filePath, 'r') as f:
-            return f.read()
+        return textures, colliders, triggers
 
-    def _Cleanup(self):
-        if self.Program:
-            gl.glDeleteProgram(self.Program)
-            self.Program = None
-        if self.InputTexture:
-            gl.glDeleteTextures(1, [self.InputTexture])
-            self.InputTexture = None
-        if self.OutputTexture:
-            gl.glDeleteTextures(1, [self.OutputTexture])
-            self.OutputTexture = None
+    def _RunShader(self, shader_path, input_data, color_mappings):
+        # Initialize GLFW without creating a visible window
+        if not glfw.init():
+            Utils.PopupManager().Error("Error: MapLib", "GLFW cannot be initialized!")
+            return
+
+        glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
+        window = glfw.create_window(640, 480, "Hidden Window", None, None)
+        if not window:
+            glfw.terminate()
+            Utils.PopupManager().Error("Error: MapLib", "GLFW Failed To Create A Window For The Shader")
+            return
+
+        glfw.make_context_current(window)
+
+        # Read the compute shader from a separate file
+        with open(shader_path, 'r') as f:
+            shader_source = f.read()
+
+        # Compile the compute shader
+        compute_shader = gl.glCreateShader(gl.GL_COMPUTE_SHADER)
+        gl.glShaderSource(compute_shader, shader_source)
+        gl.glCompileShader(compute_shader)
+
+        # Check for compilation errors
+        if not gl.glGetShaderiv(compute_shader, gl.GL_COMPILE_STATUS):
+            error_log = gl.glGetShaderInfoLog(compute_shader)
+            raise RuntimeError(f"Shader compilation failed:\n{error_log}")
+
+        # Create and link the shader program
+        program = gl.glCreateProgram()
+        gl.glAttachShader(program, compute_shader)
+        gl.glLinkProgram(program)
+
+        # Check for linking errors
+        if not gl.glGetProgramiv(program, gl.GL_LINK_STATUS):
+            error_log = gl.glGetProgramInfoLog(program)
+            raise RuntimeError(f"Shader linking failed:\n{error_log}")
+
+        gl.glDeleteShader(compute_shader)
+
+        # Create input texture array
+        input_texture = gl.glGenTextures(1)
+        gl.glBindTexture(gl.GL_TEXTURE_2D_ARRAY, input_texture)
+        gl.glTexStorage3D(gl.GL_TEXTURE_2D_ARRAY, 1, gl.GL_RGBA8, self.image_size[0], self.image_size[1], self.num_images)
+        
+        # Fill the input texture array with input data
+        data = np.zeros((self.num_images, self.image_size[1], self.image_size[0], 4), dtype=np.uint8)
+        for i in range(self.num_images):
+            data[i, :, :, :] = input_data[i]  # Input data
+
+        gl.glTexSubImage3D(gl.GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, self.image_size[0], self.image_size[1], self.num_images, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, data)
+
+        # Create output texture
+        output_texture = gl.glGenTextures(1)
+        gl.glBindTexture(gl.GL_TEXTURE_2D, output_texture)
+        output_size = (self.image_size[0] * self.grid_size[0], self.image_size[1] * self.grid_size[1])
+        gl.glTexStorage2D(gl.GL_TEXTURE_2D, 1, gl.GL_RGBA8, output_size[0], output_size[1])
+
+        # Bind textures to image units
+        gl.glBindImageTexture(0, input_texture, 0, gl.GL_TRUE, 0, gl.GL_READ_ONLY, gl.GL_RGBA8)
+        gl.glBindImageTexture(1, output_texture, 0, gl.GL_FALSE, 0, gl.GL_WRITE_ONLY, gl.GL_RGBA8)
+
+        # Use the shader program
+        gl.glUseProgram(program)
+
+        # Set uniform variables for the shader
+        gl.glUniform2i(gl.glGetUniformLocation(program, "imageSize"), *self.image_size)
+        gl.glUniform2i(gl.glGetUniformLocation(program, "gridSize"), *self.grid_size)
+        for name, color in color_mappings.items():
+            loc = gl.glGetUniformLocation(program, name)
+            gl.glUniform4f(loc, *color)
+
+        # Dispatch the compute shader
+        gl.glDispatchCompute(self.grid_size[0], self.grid_size[1], 1)
+        gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
+
+        # Retrieve the output data
+        output_data = np.zeros((output_size[1], output_size[0], 4), dtype=np.uint8)
+        gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, output_data)
+
+        # Convert the output data to an image
+        output_image = Image.fromarray(output_data, 'RGBA')
+
+        # Clean up
+        gl.glDeleteProgram(program)
+        gl.glDeleteTextures([input_texture, output_texture])
         glfw.terminate()
 
-    def RunTextureShader(self, shaderPath):
-        if not glfw.init():
-            Utils.PopupManager().Error("Error: MapLib", "GLFW cannot be initialized!")
-        
-        glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        window = glfw.create_window(640, 480, "Hidden Window", None, None)
-        if not window:
-            glfw.terminate()
-            Utils.PopupManager().Error("Error: MapLib", "GLFW Failed To Create A Window For The Shader")
-        
-        glfw.make_context_current(window)
+        return output_image
 
-        computeShaderSource = self._ReadComputeShader(shaderPath)
+    def GetMapTexture(self):
+        texture_images = [Image.open(f"Assets/Images/Map/{texture}.png").convert("RGBA") for texture in self.textures]
+        return self._run_shader("Assets/Shaders/TextureStitcher.comp", texture_images, {})
 
-        computeShader = gl.glCreateShader(gl.GL_COMPUTE_SHADER)
-        gl.glShaderSource(computeShader, computeShaderSource)
-        gl.glCompileShader(computeShader)
-
-        if not gl.glGetShaderiv(computeShader, gl.GL_COMPILE_STATUS):
-            errorLog = gl.glGetShaderInfoLog(computeShader)
-            raise RuntimeError(f"Shader compilation failed:\n{errorLog}")
-
-        self.Program = gl.glCreateProgram()
-        gl.glAttachShader(self.Program, computeShader)
-        gl.glLinkProgram(self.Program)
-
-        if not gl.glGetProgramiv(self.Program, gl.GL_LINK_STATUS):
-            errorLog = gl.glGetProgramInfoLog(self.Program)
-            raise RuntimeError(f"Shader linking failed:\n{errorLog}")
-
-        gl.glDeleteShader(computeShader)
-
-        self.InputTexture = gl.glGenTextures(1)
-        gl.glBindTexture(gl.GL_TEXTURE_2D_ARRAY, self.InputTexture)
-        gl.glTexStorage3D(gl.GL_TEXTURE_2D_ARRAY, 1, gl.GL_RGBA8, self.ImageSize[0], self.ImageSize[1], self.NumImages)
-
-        data = np.zeros((self.NumImages, self.ImageSize[1], self.ImageSize[0], 4), dtype=np.uint8)
-        for i, imageName in enumerate(self.ImagePaths.keys()):
-            if imageName in self.ImagesData:
-                imageData = self.ImagesData[imageName]
-                if imageData is not None:
-                    data[i, :imageData.shape[0], :imageData.shape[1], :] = imageData
-
-        gl.glTexSubImage3D(gl.GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, self.ImageSize[0], self.ImageSize[1], self.NumImages, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, data)
-
-        self.OutputTexture = gl.glGenTextures(1)
-        gl.glBindTexture(gl.GL_TEXTURE_2D, self.OutputTexture)
-        outputSize = (self.ImageSize[0] * self.GridSize[0], self.ImageSize[1] * self.GridSize[1])
-        gl.glTexStorage2D(gl.GL_TEXTURE_2D, 1, gl.GL_RGBA8, outputSize[0], outputSize[1])
-
-        gl.glBindImageTexture(0, self.InputTexture, 0, gl.GL_TRUE, 0, gl.GL_READ_ONLY, gl.GL_RGBA8)
-        gl.glBindImageTexture(1, self.OutputTexture, 0, gl.GL_FALSE, 0, gl.GL_WRITE_ONLY, gl.GL_RGBA8)
-
-        gl.glUseProgram(self.Program)
-
-        imageSizeLoc = gl.glGetUniformLocation(self.Program, "imageSize")
-        gridSizeLoc = gl.glGetUniformLocation(self.Program, "gridSize")
-        gl.glUniform2i(imageSizeLoc, *self.ImageSize)
-        gl.glUniform2i(gridSizeLoc, *self.GridSize)
-
-        gl.glDispatchCompute(self.GridSize[0], self.GridSize[1], 1)
-
-        gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
-
-        outputData = np.zeros((outputSize[1], outputSize[0], 4), dtype=np.uint8)
-        gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, outputData)
-
-        imageResult = Image.fromarray(outputData, 'RGBA')
-
-        self._Cleanup()
-        
-        return imageResult
-
-    def RunColliderShader(self, shaderPath):
-        if not glfw.init():
-            Utils.PopupManager().Error("Error: MapLib", "GLFW cannot be initialized!")
-        
-        glfw.window_hint(glfw.VISIBLE, glfw.FALSE)
-        window = glfw.create_window(640, 480, "Hidden Window", None, None)
-        if not window:
-            glfw.terminate()
-            Utils.PopupManager().Error("Error: MapLib", "GLFW Failed To Create A Window For The Shader")
-        
-        glfw.make_context_current(window)
-
-        computeShaderSource = self._ReadComputeShader(shaderPath)
-
-        computeShader = gl.glCreateShader(gl.GL_COMPUTE_SHADER)
-        gl.glShaderSource(computeShader, computeShaderSource)
-        gl.glCompileShader(computeShader)
-
-        if not gl.glGetShaderiv(computeShader, gl.GL_COMPILE_STATUS):
-            errorLog = gl.glGetShaderInfoLog(computeShader)
-            raise RuntimeError(f"Shader compilation failed:\n{errorLog}")
-
-        self.Program = gl.glCreateProgram()
-        gl.glAttachShader(self.Program, computeShader)
-        gl.glLinkProgram(self.Program)
-
-        if not gl.glGetProgramiv(self.Program, gl.GL_LINK_STATUS):
-            errorLog = gl.glGetProgramInfoLog(self.Program)
-            raise RuntimeError(f"Shader linking failed:\n{errorLog}")
-
-        gl.glDeleteShader(computeShader)
-
-        self.InputTexture = gl.glGenTextures(1)
-        gl.glBindTexture(gl.GL_TEXTURE_2D_ARRAY, self.InputTexture)
-        gl.glTexStorage3D(gl.GL_TEXTURE_2D_ARRAY, 1, gl.GL_RGBA8, self.ImageSize[0], self.ImageSize[1], self.NumImages)
-
-        colliderColors = {
-            "PlayerAndBullet": [255, 0, 0, 255],
-            "None": [0, 0, 0, 0],
-            "Player": [0, 0, 255, 255],
-            "Bullet": [0, 255, 0, 255]
+    def GetMapColider(self):
+        colliders_array = np.array(self.colliders).astype(np.uint8).reshape(-1, 1, 1, 1)
+        color_mappings = {
+            "colorNone": self.COLOR_NONE,
+            "colorPlayer": self.COLOR_PLAYER,
+            "colorBullet": self.COLOR_BULLET,
+            "colorPlayerAndBullet": self.COLOR_PLAYER_AND_BULLET,
         }
+        return self._run_shader("Assets/Shaders/ColliderStitcher.comp", colliders_array, color_mappings)
 
-        data = np.zeros((self.NumImages, self.ImageSize[1], self.ImageSize[0], 4), dtype=np.uint8)
-        for i, row in enumerate(self.MapData):
-            for j, item in enumerate(row.split(', ')):
-                color = colliderColors.get(item, [0, 0, 0, 0])
-                index = i * self.GridSize[1] + j
-                data[index, :, :, :] = color
-
-        gl.glTexSubImage3D(gl.GL_TEXTURE_2D_ARRAY, 0, 0, 0, 0, self.ImageSize[0], self.ImageSize[1], self.NumImages, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, data)
-
-        self.OutputTexture = gl.glGenTextures(1)
-        gl.glBindTexture(gl.GL_TEXTURE_2D, self.OutputTexture)
-        outputSize = (self.ImageSize[0] * self.GridSize[0], self.ImageSize[1] * self.GridSize[1])
-        gl.glTexStorage2D(gl.GL_TEXTURE_2D, 1, gl.GL_RGBA8, outputSize[0], outputSize[1])
-
-        gl.glBindImageTexture(0, self.InputTexture, 0, gl.GL_TRUE, 0, gl.GL_READ_ONLY, gl.GL_RGBA8)
-        gl.glBindImageTexture(1, self.OutputTexture, 0, gl.GL_FALSE, 0, gl.GL_WRITE_ONLY, gl.GL_RGBA8)
-
-        gl.glUseProgram(self.Program)
-
-        imageSizeLoc = gl.glGetUniformLocation(self.Program, "imageSize")
-        gridSizeLoc = gl.glGetUniformLocation(self.Program, "gridSize")
-        gl.glUniform2i(imageSizeLoc, *self.ImageSize)
-        gl.glUniform2i(gridSizeLoc, *self.GridSize)
-
-        gl.glDispatchCompute(self.GridSize[0], self.GridSize[1], 1)
-
-        gl.glMemoryBarrier(gl.GL_SHADER_IMAGE_ACCESS_BARRIER_BIT)
-
-        outputData = np.zeros((outputSize[1], outputSize[0], 4), dtype=np.uint8)
-        gl.glGetTexImage(gl.GL_TEXTURE_2D, 0, gl.GL_RGBA, gl.GL_UNSIGNED_BYTE, outputData)
-
-        imageResult = Image.fromarray(outputData, 'RGBA')
-
-        self._Cleanup()
-        
-        return imageResult
-
-
+    def GetMapTrigger(self):
+        triggers_array = np.array(self.triggers).astype(np.uint8).reshape(-1, 1, 1, 1)
+        color_mappings = {
+            "colorNone": self.TRIGGER_COLOR_NONE,
+            "colorPlayerSpawn": self.TRIGGER_COLOR_PLAYER_SPAWN,
+            "colorHpLargeSpawn": self.TRIGGER_COLOR_HP_LARGE_SPAWN,
+            "colorAmmoLargeSpawn": self.TRIGGER_COLOR_AMMO_LARGE_SPAWN,
+            "colorAmmoSmallSpawn": self.TRIGGER_COLOR_AMMO_SMALL_SPAWN,
+            "colorHpSmallSpawn": self.TRIGGER_COLOR_HP_SMALL_SPAWN,
+        }
+        return self._run_shader("Assets/Shaders/TriggerStitcher.comp", triggers_array, color_mappings)
