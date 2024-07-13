@@ -13,7 +13,7 @@ ScreenWidth = 800
 ScreenHeight = 600
 
 # Set the window title
-pygame.display.set_caption("Meme Mayhem: Main Menu")
+pygame.display.set_caption("Meme Mayhem - Main Menu")
 
 # Try to create a display surface with vsync enabled
 try:
@@ -69,8 +69,8 @@ settings_buttons = [
 # Function to display the main menu
 def MainMenu():
     # Load and play the main theme music
-    pygame.mixer.music.load("Assets/Sound/Meme Mayhem Main Theme.mp3")
-    pygame.mixer.music.play(-1)
+    pygame.mixer.music.load("Assets/Sound/Prisoner.mp3")
+    pygame.mixer.music.play()
     
     while True:
         for event in pygame.event.get():

@@ -36,6 +36,7 @@ class Game:
     def Render(self):
         pass
 
+
 # Gui class inheriting from Game
 class Gui(Game):
     def __init__(self):
