@@ -10,16 +10,7 @@ class Message:
         self.data = Data
     
     def __repr__(self):
-        return f"[{self.prefix}, {self.message_name}, {self.ip}, {self.data}]"
-
-    def encode(self):
-        return f"{self.prefix}|{self.message_name}|{self.ip}|{self.data}"
-
-    @staticmethod
-    def decode(message_str):
-        parts = message_str.split('|')
-        return Message(parts[0], parts[1], parts[2], parts[3])
-
+        return [self.prefix, self.message_name, self.ip, self.data]
 
 # Server class to handle connections and communication with clients
 class Server:
@@ -76,7 +67,6 @@ class Server:
             client_handler = threading.Thread(target=self.handle_client, args=(client_socket, address))
             client_handler.start()
 
-
 # Client class to connect to the server and communicate
 class Client:
     def __init__(self, host='127.0.0.1', port=65432):
@@ -93,8 +83,8 @@ class Client:
         self.receiving_thread.start()
 
     # Method to send a message to the server
-    def send_message(self, prefix, message_name, data):
-        message = Message(prefix, message_name, socket.gethostbyname(socket.gethostname()), data)
+    def send_message(self, message_name, data):
+        message = Message("CLNT", message_name, self.host, data)
         self.client_socket.send(message.encode().encode('utf-8'))
 
     # Method to receive messages from the server
@@ -120,6 +110,3 @@ class Client:
     def close(self):
         self.client_socket.close()
         print("Client connection closed.")
-
-
-
