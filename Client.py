@@ -1,7 +1,7 @@
 import pygame
 import pygame_gui
 import threading
-import MultiPlayer  
+import FLEXCOM  
 import Utils
 
 # Base Game class
