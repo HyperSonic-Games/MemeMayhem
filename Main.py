@@ -1,6 +1,7 @@
 import pygame
 import sys
 import subprocess
+import Utils
 
 print("""
 Copyright (c) 2024 HyperSonic-Games
@@ -108,8 +109,9 @@ def MainMenu():
                         if button.text == "Play":
                             # Stop music, quit Pygame, and run Client.py
                             pygame.mixer.music.stop()
+                            ServerIP = Utils.PopupManager().TextInput("Conect To Server", "IPv4")
                             pygame.quit()
-                            subprocess.run(["python", "Client.py"], creationflags=CREATE_NO_WINDOW)
+                            subprocess.run(["python", "Client.py", ServerIP], creationflags=CREATE_NO_WINDOW)
                             sys.exit()  # Exit Python
                         
                         elif button.text == "Host":

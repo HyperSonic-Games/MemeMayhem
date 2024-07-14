@@ -83,8 +83,8 @@ class Client:
         self.receiving_thread.start()
 
     # Method to send a message to the server
-    def send_message(self, message_name, data):
-        message = Message("CLNT", message_name, self.host, data)
+    def send_message(self, prefix, message_name, data):
+        message = Message(prefix, message_name, socket.gethostbyname(socket.gethostname()), data)
         self.client_socket.send(message.encode().encode('utf-8'))
 
     # Method to receive messages from the server
