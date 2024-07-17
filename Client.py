@@ -4,6 +4,7 @@ import threading
 import FLEXCOM  
 import Utils
 import sys
+from SettingsManager import SettingsManager
 
 # Base Game class
 class Game:
@@ -24,7 +25,10 @@ class Game:
 
         # Initialize pygame and setup the display
         pygame.init()
-        self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight))
+        if (SettingsManager("SETTINGS.toml").GetSetting("RENDERING", "VSync") == True or "True"):
+            self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight), pygame.SCALED, vsync=1)
+        else:
+            self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight), pygame.SCALED)
         pygame.display.set_caption(self.WindowTitle)
 
         # Toggle fullscreen mode if possible
@@ -43,6 +47,35 @@ class Game:
     def Render(self):
         self.screen.fill((0, 0, 0))  # Example: clear screen with black
 
+
+# Hp Bar Gui Component
+class HpBar:
+    def __init__(self):
+        # NOTE: No Heart Asset Exists but it will be loaded here when it does
+        # self.HeartIcon = pygame.image.load("Assets/Images/Gui/Heart.png")
+        self.MAX_HEALTH = 100
+        self.Health = 100
+    
+    def GetHealth(self) -> int:
+        return self.Health
+    
+    def ClampHealth(self, Health: int):
+        if (Health > self.MAX_HEALTH):
+            return 100
+        elif (Health + self.Health > self.MAX_HEALTH):
+            return 100
+        else:
+            return Health
+    
+    def SetHealth(self, Health: int):
+        # Fuck You Cheaters
+        if (Health > self.MAX_HEALTH):
+            Utils.PopupManager().Info("Come On Man Realy", "Cheating Is Not Cool I Expected Better Of You :(")
+            sys.exit(0)
+        else:
+            self.Health = Health
+            
+            
 
 # Gui class inheriting from Game
 class Gui(Game):

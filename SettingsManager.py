@@ -2,8 +2,22 @@ import pygame
 import pygame_gui
 import toml
 
-# Class to manage settings loaded from a TOML file
 class SettingsManager:
+    def __init__(self, filename):
+        # Load settings from the TOML file
+        with open(filename, 'r') as f:
+            self.settings = toml.load(f)
+        
+    def GetSetting(self, section, setting_name):
+        # Retrieve a specific setting from a given section
+        section_data = self.settings.get(section)
+        if section_data:
+            return section_data.get(setting_name)
+        return None
+
+
+# Class to manage settings loaded from a TOML file
+class SettingsManagerUi:
     def __init__(self, filename):
         self.filename = filename
         self.settings = self.load_settings()  # Load settings when initializing
@@ -33,13 +47,13 @@ BUTTON_COLOR = (50, 50, 50)
 BUTTON_TEXT_COLOR = (200, 200, 200)
 
 # Load settings and calculate the window height based on the number of settings sections and elements
-settings_manager = SettingsManager('SETTINGS.toml')
+settings_manager = SettingsManagerUi('SETTINGS.toml')
 num_sections = len(settings_manager.get_settings())
 num_elements = sum(len(values) for values in settings_manager.get_settings().values())
 window_height = 50 + num_sections * 40 + num_elements * 40 + 150  # Calculate total height
 
 # Set up display with calculated dimensions, limiting height to 600 if needed
-screen = pygame.display.set_mode((400, min(window_height, 600)))
+screen = pygame.display.set_mode((400, min(window_height, 600)), pygame.SCALED)
 pygame.display.set_caption('Settings Editor')
 
 # Initialize pygame GUI manager
