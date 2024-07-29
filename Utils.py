@@ -24,7 +24,7 @@ class PopupManager:
         #   Text (str): The text content of the error message.
         pyautogui.alert(text=Text, title=Title, button='OK',)
     
-    def TextInput(self, Title, Prompt):
+    def TextInput(self, Title, Prompt) -> str:
         # Prompt the user for text input
         # Arguments:
         #   Title (str): The title of the text input prompt.
