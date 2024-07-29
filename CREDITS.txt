@@ -8,4 +8,4 @@ Everet Morman
 Gunner 
 
 [Sound]
-MainTheme: Prisoner by Karl Casey @ White Bat Audio 
+Prisoner by Karl Casey @ White Bat Audio
