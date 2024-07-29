@@ -1,3 +1,6 @@
 [submodule "FLEXCOM"]
 	path = FLEXCOM
 	url = https://github.com/HyperSonic-Games/FLEXCOM.git
+[submodule "hsgm"]
+	path = hsgm
+	url = https://github.com/HyperSonic-Games/hsgm.git
