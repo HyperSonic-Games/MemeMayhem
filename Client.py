@@ -2,6 +2,7 @@ import pygame
 import pygame_gui
 import threading
 
+
 import Utils
 import sys
 from SettingsManager import SettingsManager
