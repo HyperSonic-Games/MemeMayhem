@@ -2,9 +2,9 @@ import pygame
 import pygame_gui
 import threading
 
+import SettingsManager
 import Utils
 import sys
-from SettingsManager import SettingsManager
 
 # Base Game class
 class Game:
@@ -12,6 +12,11 @@ class Game:
     ServerAddress: str = None  # Class-level attribute to store the server address
 
     def __init__(self):
+        # Load settings from the SettingsManager
+        self.settings_manager = SettingsManager.SettingsManager("meme_mayhem_settings.toml")
+        vsync_setting = self.settings_manager.GetVSync()
+        fullscreen_setting = self.settings_manager.GetFullscreen()
+
         # Get the user's name using a popup input only once
         if Game.UserName is None:
             Game.UserName = Utils.PopupManager().TextInput("Enter Your User Name", "User Name: ")
@@ -27,42 +32,40 @@ class Game:
 
         # Initialize pygame and setup the display
         pygame.init()
-        vsync_setting = SettingsManager("SETTINGS.toml").GetSetting("RENDERING", "VSync")
-        if vsync_setting in [True, "True"]:
-            self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight), pygame.SCALED, vsync=1)
-        else:
-            self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight), pygame.SCALED)
-        pygame.display.set_caption(self.WindowTitle)
 
-        # Toggle fullscreen mode if possible
-        try:
-            pygame.display.toggle_fullscreen()
-        except pygame.error:
-            # If initialization fails, show an error popup and exit
-            Utils.PopupManager.Error("Error: Client", "Pygame Display Surface Failed To Initialize")
-            pygame.quit()
-            exit(1)
+        display_flags = pygame.SCALED
+        if fullscreen_setting:
+            display_flags |= pygame.FULLSCREEN
+
+        if vsync_setting:
+            self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight), display_flags, vsync=1)
+        else:
+            self.screen = pygame.display.set_mode((self.WindowWidth, self.WindowHeight), display_flags)
+
+        pygame.display.set_caption(self.WindowTitle)
 
     def GetRenderContext(self):
         return self.screen
-    
+
     # Renders The Map And The Rest Of The Clients
     def Render(self):
         pass
+
 
 # Base class for all GUI components
 class GuiComponent:
     def __init__(self, x: int, y: int):
         self.x = x
         self.y = y
-    
+
     def Render(self, surface):
         """Draw the component on the given surface."""
         raise NotImplementedError("Render method must be overridden in derived classes.")
-    
+
     def Update(self, time_delta):
         """Update the component's state."""
         raise NotImplementedError("Update method must be overridden in derived classes.")
+
 
 # Hp Bar Gui Component inheriting from GuiComponent
 class HpBar(GuiComponent):
@@ -82,12 +85,13 @@ class HpBar(GuiComponent):
         # Placeholder for potential health bar updates
         pass
 
+
 # Gui class managing GuiComponents, inheriting from Game
 class Gui(Game):
     def __init__(self):
         super().__init__()
         self.components = []  # List to store GUI components
-    
+
     def AddComponent(self, component: GuiComponent):
         """Add a GuiComponent to the GUI."""
         self.components.append(component)
@@ -107,14 +111,14 @@ class Gui(Game):
 class Player(Game):
     def __init__(self):
         super().__init__()
-    
+
     def GetHealth(self) -> int:
         # Grab Hp Data From The Server
         pass
-    
-    
+
     def Render(self):
         render_context = super().GetRenderContext()
+
 
 # Main entry point
 if __name__ == "__main__":
@@ -122,16 +126,12 @@ if __name__ == "__main__":
     gui = Gui()
     player = Player()
 
-   
-    
-   
     running = True  # Main loop control variable
     clock = pygame.time.Clock()  # Clock object to control frame rate
 
     while running:
         time_delta = clock.tick(60) / 1000  # Convert to seconds
         for event in pygame.event.get():
-            
             if event.type == pygame.QUIT:
                 running = False  # Exit the loop if the window is closed
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
@@ -144,5 +144,5 @@ if __name__ == "__main__":
         gui.Render()  # Render all GUI components
 
         pygame.display.flip()  # Update the display with the rendered frame
-    
+
     pygame.quit()  # Quit pygame when the loop ends
