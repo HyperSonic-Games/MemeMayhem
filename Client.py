@@ -2,11 +2,8 @@ import pygame
 import pygame_gui
 import threading
 
-<<<<<<< HEAD
 import SettingsManager
-=======
 
->>>>>>> 89a11c2316637c19efbed56e7b592219ddae608e
 import Utils
 import sys
 
