@@ -7,5 +7,9 @@ Everet Morman
 [Assets]
 Gunner 
 
+
+[Voice Acting]
+Iceman4129
+
 [Sound]
 Prisoner by Karl Casey @ White Bat Audio
