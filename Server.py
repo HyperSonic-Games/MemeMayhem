@@ -1,45 +1,70 @@
-import FLEXCOM.FLEXCOM
 import socket
 import threading
+import pickle
 
-class Server:
-    def __init__(self, host='127.0.0.1', port=65432):
-        self.host = host
-        self.port = port
-        self.server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.server_socket.bind((self.host, self.port))
-        self.server_socket.listen(5)
-        print(f"[INFO] Server started at {self.host}:{self.port}")
+# List to store player data
+players = {}
 
-    def handle_client(self, client_socket, address):
-        print(f"[INFO] Connection from {address} has been established.")
-        client_socket.send("Welcome to the server!".encode('utf-8'))
+# Function to handle communication with each client
+def handle_client(client_socket, client_address):
+    global players
 
+    print(f"New connection from {client_address}")
+    client_socket.send("Connected to server.".encode())
+
+    player_data = {
+        'x': 400,
+        'y': 300,
+        'health': 100
+    }
+
+    # Add the player to the game world
+    players[client_address] = player_data
+
+    try:
         while True:
-            try:
-                msg = client_socket.recv(1024).decode('utf-8')
-                if msg:
-                    print(f"[RECEIVED] {msg} from {address}")
-                    response = f"Server received: {msg}"
-                    client_socket.send(response.encode('utf-8'))
-                    print(f"[SENT] Response to {address}")
-                else:
-                    print(f"[INFO] Connection with {address} has been closed.")
-                    break
-            except ConnectionResetError:
-                print(f"[ERROR] Connection with {address} was closed unexpectedly.")
+            # Receive data from the client
+            data = client_socket.recv(1024)
+
+            if not data:
                 break
 
+            # Unpickle the data (client sends positions or actions)
+            player_input = pickle.loads(data)
+            player_data['x'] = player_input.get('x', player_data['x'])
+            player_data['y'] = player_input.get('y', player_data['y'])
+
+            # Broadcast the updated game state to all clients
+            game_state = pickle.dumps(players)
+            for client in players:
+                if client != client_address:
+                    try:
+                        client_socket.send(game_state)
+                    except:
+                        continue
+
+    except Exception as e:
+        print(f"Error with client {client_address}: {e}")
+    finally:
+        del players[client_address]
         client_socket.close()
 
-    def run(self):
-        print("[INFO] Server is running and waiting for connections...")
-        while True:
-            client_socket, address = self.server_socket.accept()
-            print(f"[INFO] Accepted connection from {address}")
-            client_handler = threading.Thread(target=self.handle_client, args=(client_socket, address))
-            client_handler.start()
+# Function to start the server
+def start_server():
+    host = '127.0.0.1'
+    port = 12345
 
-if __name__ == "__main__":
-    server = Server()
-    server.run()
+    # Create a socket object
+    server_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    server_socket.bind((host, port))
+    server_socket.listen(5)
+
+    print(f"Server listening on {host}:{port}...")
+
+    while True:
+        client_socket, client_address = server_socket.accept()
+        client_thread = threading.Thread(target=handle_client, args=(client_socket, client_address))
+        client_thread.start()
+
+if __name__ == '__main__':
+    start_server()

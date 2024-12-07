@@ -1,45 +1,61 @@
-import FLEXCOM.FLEXCOM
+import pygame
 import socket
-import threading
+import pickle
 
-class Client:
-    def __init__(self, host='127.0.0.1', port=65432):
-        self.host = host
-        self.port = port
-        self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.client_socket.connect((self.host, self.port))
-        print(f"[INFO] Connected to server at {self.host}:{self.port}")
+# Pygame setup
+pygame.init()
+width, height = 800, 600
+screen = pygame.display.set_mode((width, height))
+clock = pygame.time.Clock()
 
-        # Start a thread to listen for server messages
-        self.receiving_thread = threading.Thread(target=self.receive_messages)
-        self.receiving_thread.start()
+# Player settings
+player_size = 50
+player_color = (0, 128, 255)
+player_x, player_y = 400, 300
+player_speed = 5
 
-    def send_message(self, message):
-        self.client_socket.send(message.encode('utf-8'))
-        print(f"[SENT] {message}")
+# Socket setup
+host = '127.0.0.1'
+port = 12345
+client_socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+client_socket.connect((host, port))
 
-    def receive_messages(self):
-        while True:
-            try:
-                response = self.client_socket.recv(1024).decode('utf-8')
-                if response:
-                    print(f"[RECEIVED] {response}")
-                else:
-                    print("[INFO] Server closed the connection.")
-                    break
-            except ConnectionResetError:
-                print("[ERROR] Connection was closed by the server.")
-                break
+# Game loop
+running = True
+while running:
+    screen.fill((0, 0, 0))  # Clear screen
 
-    def close(self):
-        self.client_socket.close()
-        print("[INFO] Client connection closed.")
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
 
-if __name__ == "__main__":
-    client = Client()
-    while True:
-        msg = input("Enter a message to send to the server (or 'quit' to exit): ")
-        if msg.lower() == 'quit':
-            client.close()
-            break
-        client.send_message(msg)
+    # Get key states for movement
+    keys = pygame.key.get_pressed()
+
+    if keys[pygame.K_LEFT]:
+        player_x -= player_speed
+    if keys[pygame.K_RIGHT]:
+        player_x += player_speed
+    if keys[pygame.K_UP]:
+        player_y -= player_speed
+    if keys[pygame.K_DOWN]:
+        player_y += player_speed
+
+    # Send player position to the server
+    player_data = {'x': player_x, 'y': player_y}
+    client_socket.send(pickle.dumps(player_data))
+
+    # Receive the game state (positions of all players)
+    game_state = client_socket.recv(1024)
+    players = pickle.loads(game_state)
+
+    # Draw all players (for this example, we draw all players as rectangles)
+    for player_address, player_info in players.items():
+        pygame.draw.rect(screen, player_color, (player_info['x'], player_info['y'], player_size, player_size))
+
+    pygame.display.flip()
+    clock.tick(30)
+
+# Close the connection when done
+client_socket.close()
+pygame.quit()
