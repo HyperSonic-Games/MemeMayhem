@@ -1,80 +1,89 @@
+import toml
 import pygame
-import sys
+import os
 
-class InputUtils:
-    @staticmethod
-    def handle_events(input_manager):
-        """Handle all events and pass them to the input manager."""
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                input_manager.quit_game()
-            elif event.type == pygame.KEYDOWN:
-                input_manager.key_down(event.key)
-            elif event.type == pygame.KEYUP:
-                input_manager.key_up(event.key)
+# Import PopupManager for error messages
+import Utils
 
-class InputManager:
-    def __init__(self):
-        self.actions = {
-            pygame.K_w: self.move_forward,
-            pygame.K_s: self.move_backward,
-            pygame.K_a: self.move_left,
-            pygame.K_d: self.move_right,
-            pygame.K_SPACE: self.shoot,
-            pygame.K_e: self.interact,
-            pygame.K_q: self.quit_game
-        }
-        self.pressed_keys = set()
+# Global constant to enable/disable dev mode (set this accordingly)
 
-    def key_down(self, key):
-        """Handle key press events."""
-        if key in self.actions:
-            self.actions[key]()
-        self.pressed_keys.add(key)
+DEV_MODE = False  
 
-    def key_up(self, key):
-        """Handle key release events."""
-        if key in self.pressed_keys:
-            self.pressed_keys.remove(key)
+# Initialize PopupManager
+popup = Utils.PopupManager()
 
-    def move_forward(self):
-        print("Moving forward")
 
-    def move_backward(self):
-        print("Moving backward")
 
-    def move_left(self):
-        print("Moving left")
+class SettingsManager:
+    MOUSE_MAPPING = {
+        "LMB": pygame.BUTTON_LEFT,
+        "RMB": pygame.BUTTON_RIGHT,
+        "MMB": pygame.BUTTON_MIDDLE
+    }
 
-    def move_right(self):
-        print("Moving right")
+    def __init__(self, PathToTomlConfigFile: os.PathLike):
+        self.TomlPath: os.PathLike = PathToTomlConfigFile
+        self.config = self._LoadConfig()
 
-    def shoot(self):
-        print("Shooting")
+    """
+    INTERNAL FUNCTION DO NOT USE
+    """
+    def _LoadConfig(self):
+        if not os.path.exists(self.TomlPath):
+            self._handle_error("Config file not found", f"Could not locate: {self.TomlPath}")
+            return {}
 
-    def interact(self):
-        print("Interacting")
+        return toml.load(self.TomlPath)
 
-    def quit_game(self):
-        print("Quitting game")
-        pygame.quit()
-        sys.exit()
+    def _handle_error(self, title: str, message: str):
+        """
+        INERNAL DO NOT USE
+        Handles errors based on DEV_MODE setting.
+        """
+        if DEV_MODE:
+            print(f"[ERROR] {title}: {message}")
+        else:
+            popup.Error(title, message)
 
-# Example usage
-def main():
-    pygame.init()
-    screen = pygame.display.set_mode((800, 600))
-    pygame.display.set_caption("3rd Person Shooter Input Manager")
+    def _get_key_code(self, key_name: str, default: str) -> int:
+        """
+        INERNAL DO NOT USE
+        Fetch a key from the config and convert it to a pygame key constant or mouse button.
+        Logs errors if an invalid key is used and falls back to default.
+        """
+        key_str = self.config.get("CONTROLS", {}).get(key_name, default)
 
-    input_manager = InputManager()
+        # Check if it's a mouse button
+        if key_str in self.MOUSE_MAPPING:
+            return self.MOUSE_MAPPING[key_str]
 
-    while True:
-        InputUtils.handle_events(input_manager)
-        screen.fill((0, 0, 0))  # Clear the screen with black
+        # Otherwise, assume it's a keyboard key
+        try:
+            return pygame.key.key_code(key_str)
+        except ValueError:
+            self._handle_error("Invalid Key Binding", f"'{key_str}' is not a valid key for '{key_name}'. Using default '{default}' instead.")
+            return pygame.key.key_code(default)
 
-        # Here you would update game logic and render game objects
+    def GetControls_MoveUp(self) -> int:
+        return self._get_key_code("MoveUp", "w")
 
-        pygame.display.flip()  # Update the full display Surface to the screen
+    def GetControls_MoveDown(self) -> int:
+        return self._get_key_code("MoveDown", "s")
 
-if __name__ == "__main__":
-    main()
+    def GetControls_MoveLeft(self) -> int:
+        return self._get_key_code("MoveLeft", "a")
+
+    def GetControls_MoveRight(self) -> int:
+        return self._get_key_code("MoveRight", "d")
+
+    def GetControls_FireWeapon(self) -> int:
+        return self._get_key_code("FireWeapon", "LMB")
+
+    def GetControls_ReloadWeapon(self) -> int:
+        return self._get_key_code("ReloadWeapon", "r")
+
+    def GetRendering_VSync(self) -> bool:
+        return self.config.get("RENDERING", {}).get("VSync", False)
+
+    def GetRendering_Fullscreen(self) -> bool:
+        return self.config.get("RENDERING", {}).get("Fullscreen", False)
