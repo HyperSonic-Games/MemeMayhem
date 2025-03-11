@@ -2,17 +2,30 @@ import pygame
 import sys
 import subprocess
 import random
+from pypresence import Presence
+import time
+import os
+import Utils
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
 # DEV MODE
 DEV_MODE = True
 
-# Suppress console window in subprocesses if not in DEV_MODE
-CREATE_NO_WINDOW = 0x08000000 if not DEV_MODE else 0
+# Suppress console window in subprocesses
+CREATE_NO_WINDOW = 0x08000000
 
 # Initialize Pygame
 pygame.init()
+
+
+
+
+# Initialize Discord RPC
+if Utils.IsDiscordAppInstalled() == True:
+    RPC = Presence(DISCORD_APP_CLIENT_ID)
+    RPC.connect() # Start the handshake loop
+    RPC.update(state="Rich Presence using pypresence!") # Updates our presence
 
 # Screen settings
 SCREEN_WIDTH = 800
@@ -44,7 +57,7 @@ BUTTON_SPACING = 20
 def load_splash_text():
     """Load a random splash text from file."""
     try:
-        with open("Assets/splash_text.txt", "r", encoding="utf-8") as file:
+        with open("Assets/splash.txt", "r", encoding="utf-8") as file:
             lines = [line.strip() for line in file if line.strip()]
             return random.choice(lines) if lines else "Welcome!"
     except FileNotFoundError:
@@ -87,7 +100,9 @@ def play_game():
     pygame.quit()
     if DEV_MODE:
         print("[DEBUG] Launching Client.py")
-    subprocess.run(["python", "Client.py"], creationflags=CREATE_NO_WINDOW)
+        subprocess.run(["python", "Client.py"])
+    else:
+        subprocess.run(["python", "Client.py"], creationflags=CREATE_NO_WINDOW)
     sys.exit()
 
 def host_game():
@@ -96,7 +111,9 @@ def host_game():
     pygame.quit()
     if DEV_MODE:
         print("[DEBUG] Launching Server.py")
-    subprocess.run(["python", "Server.py"], creationflags=CREATE_NO_WINDOW)
+        subprocess.run(["python", "Server.py"])
+    else:
+        subprocess.run(["python", "Server.py"], creationflags=CREATE_NO_WINDOW)
     sys.exit()
 
 def show_credits():
@@ -120,7 +137,7 @@ def main_menu():
         if DEV_MODE:
             print(f"[DEBUG] Failed to load music: {e}")
 
-    splash_font = get_scaled_font(10)  # Splash text should be larger
+    splash_font = get_scaled_font(20)  # Splash text should be larger
 
     while True:
         for event in pygame.event.get():

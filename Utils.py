@@ -2,9 +2,44 @@ import ctypes
 import tkinter as tk
 from tkinter import messagebox, simpledialog
 import platform
+import os
+import sys
+import shutil
 
 # DEV MODE
 DEV_MODE = True
+
+# Check if discord is installed
+def IsDiscordAppInstalled() -> bool:
+    """Check if the Discord application is installed based on the OS."""
+    if sys.platform.startswith("win"):
+        # Windows: Check the LocalAppData directory for Discord
+        discord_paths = [
+            os.path.join(os.getenv("LOCALAPPDATA", ""), "Discord"),
+            os.path.join(os.getenv("LOCALAPPDATA", ""), "DiscordCanary"),
+            os.path.join(os.getenv("LOCALAPPDATA", ""), "DiscordPTB"),
+        ]
+        return any(os.path.exists(path) for path in discord_paths)
+
+    elif sys.platform.startswith("linux"):
+        # Linux: Check common locations or use `shutil.which`
+        return any(os.path.exists(path) for path in [
+            "/usr/bin/discord",
+            "/snap/bin/discord",
+            os.path.expanduser("~/.local/bin/discord"),
+        ]) or shutil.which("discord") is not None
+
+    elif sys.platform.startswith("darwin"):
+        # macOS: Check the Applications folder
+        discord_paths = [
+            "/Applications/Discord.app",
+            "/Applications/Discord Canary.app",
+            "/Applications/Discord PTB.app"
+        ]
+        return any(os.path.exists(path) for path in discord_paths)
+
+    return False  # Unknown platform
+
 
 class PopupManager:
     def __init__(self):
