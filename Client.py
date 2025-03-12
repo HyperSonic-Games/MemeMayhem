@@ -1,6 +1,5 @@
 import pygame
 import socket
-import pickle
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 

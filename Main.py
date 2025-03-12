@@ -3,8 +3,6 @@ import sys
 import subprocess
 import random
 from pypresence import Presence
-import time
-import os
 import Utils
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
