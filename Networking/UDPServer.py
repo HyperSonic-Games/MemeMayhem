@@ -1,8 +1,7 @@
 import socket
 import time
 from enum import Enum
-from Serializer import Serializer
-import Messages
+from . import Serializer
 
 
 class UdpServer:
@@ -21,6 +20,7 @@ class UdpServer:
         self.TimeDelta = timeDelta
         self.Players = {}
         self.MessageHandler = messageHandler  # Store the message handler
+        self.serializer = Serializer.Serializer()
 
     def SendToClient(self, clientAddress, message):
         """
@@ -30,7 +30,7 @@ class UdpServer:
         - clientAddress (tuple): Address and port of the client.
         - message (dict): Message to send to the client.
         """
-        packet = Serializer.Serialize(message)
+        packet = self.serializer.serialize(message)
         self.ServerSocket.sendto(packet, clientAddress)
 
     def HandleClientMessage(self, data, clientAddress):
@@ -43,7 +43,7 @@ class UdpServer:
         """
         # Deserialize the data
         try:
-            message = Serializer.Deserialize(data)
+            message = self.serializer.deserialize(data)
         except ValueError:
             print(f"Failed to deserialize message from {clientAddress}")
             return

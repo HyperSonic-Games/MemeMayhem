@@ -1,14 +1,18 @@
 import pygame
 import sys
 import subprocess
+import platform
 import random
 from pypresence import Presence
 import Utils
+import SettingsManager
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
 # DEV MODE
 DEV_MODE = True
+
+SM = SettingsManager.SettingsManager("SETTINGS.toml")
 
 # Suppress console window in subprocesses
 CREATE_NO_WINDOW = 0x08000000
@@ -16,8 +20,7 @@ CREATE_NO_WINDOW = 0x08000000
 # Initialize Pygame
 pygame.init()
 
-
-
+Utils.hide_console_window()
 
 # Initialize Discord RPC
 if Utils.IsDiscordAppInstalled() == True:
@@ -109,9 +112,11 @@ def host_game():
     pygame.quit()
     if DEV_MODE:
         print("[DEBUG] Launching Server.py")
+        Utils.show_console_window()
         subprocess.run(["python", "Server.py"])
     else:
-        subprocess.run(["python", "Server.py"], creationflags=CREATE_NO_WINDOW)
+        Utils.show_console_window()
+        subprocess.run(["python", "Server.py"])
     sys.exit()
 
 def show_credits():
@@ -119,7 +124,7 @@ def show_credits():
     if DEV_MODE:
         print("[DEBUG] Credits button clicked - Feature not implemented yet.")
 
-# ---- Create Buttons (without Settings) ----
+# ---- Create Buttons ----
 MAIN_MENU_BUTTONS = [
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 - BUTTON_HEIGHT - BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Play", play_game),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Host", host_game),
@@ -135,7 +140,7 @@ def main_menu():
         if DEV_MODE:
             print(f"[DEBUG] Failed to load music: {e}")
 
-    splash_font = get_scaled_font(20)  # Splash text should be larger
+    splash_font = get_scaled_font(21)  # Splash text should be larger
 
     while True:
         for event in pygame.event.get():

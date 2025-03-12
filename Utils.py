@@ -9,6 +9,7 @@ import shutil
 # DEV MODE
 DEV_MODE = True
 
+
 # Check if discord is installed
 def IsDiscordAppInstalled() -> bool:
     """Check if the Discord application is installed based on the OS."""

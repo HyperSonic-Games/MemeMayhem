@@ -1,3 +1,4 @@
-toml == 0.10.2
-pypresence == 4.3.0
-pygame == 2.6.1
+toml==0.10.2
+pypresence==4.3.0
+pygame==2.6.1
+pywin32==309; sys_platform == 'win32'

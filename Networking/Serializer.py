@@ -4,6 +4,7 @@ import base64
 import json
 from typing import Any
 
+
 class Serializer:
     @staticmethod
     def serialize(data: Any) -> bytes:

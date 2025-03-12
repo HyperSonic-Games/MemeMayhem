@@ -1,7 +1,7 @@
 import socket
 import time
 from enum import Enum
-from Serializer import Serializer
+import Serializer
 import Messages
 
 
@@ -33,18 +33,20 @@ class UdpClient:
         self.Velocity = (1, 1)  # Example velocity (dx, dy)
         self.TimeDelta = timeDelta
         self.MsgHandler = msgHandler
+        self.serializer = Serializer.Serializer()
 
     def SendPositionToServer(self, position, velocity):
         """
         Send the current player's position to the server.
         """
         message = {
-            'type': Messages.MessageType.DATA_PUSH.name,  # Use enum name for message type
-            'position': position,
-            'velocity': velocity
+            'TYPE': Messages.MessageType.DATA_PUSH.name,  # Use enum name for message type
+            'HEADER': "CLIENT_POS_UPDATE",
+            'POSITION': position,
+            'VELOCITY': velocity
         }
         # Serialize and send the message
-        packet = Serializer.Serialize(message)
+        packet = self.serializer.serialize(message)
         self.ClientSocket.sendto(packet, self.ServerAddress)
 
     def ReceiveData(self):
@@ -52,7 +54,7 @@ class UdpClient:
         Receive data from the server and pass it to the message handler.
         """
         data, server = self.ClientSocket.recvfrom(4096)  # Receive server's response
-        receivedData = Serializer.Deserialize(data)
+        receivedData = self.serializer.deserialize(data)
         self.MsgHandler(receivedData)  # Pass the received data to the handler function
 
     def Run(self):
