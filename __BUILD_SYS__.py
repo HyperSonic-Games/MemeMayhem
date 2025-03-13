@@ -1,6 +1,5 @@
 import PyInstaller.__main__
 import os
-import platform
 import shutil
 
 OUTPUT_DIR = "output"
@@ -31,9 +30,9 @@ def BuildMain():
 def CopyFiles():
     """ Copies necessary files to the output directory. """
 
-    if platform.system() == 'Windows':
-        shutil.copy("SETTINGS.toml", OUTPUT_DIR)
-        shutil.copytree("Assets", os.path.join(OUTPUT_DIR, "Assets"), dirs_exist_ok=True)
+    shutil.copy("SETTINGS.toml", OUTPUT_DIR)
+    shutil.copytree("Assets", os.path.join(OUTPUT_DIR, "Assets"), dirs_exist_ok=True)
+
 
 # Build executables
 BuildMain()
