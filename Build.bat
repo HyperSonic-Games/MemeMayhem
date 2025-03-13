@@ -34,7 +34,7 @@ pip install -r requirements.txt
 
 :: Build the project
 echo Building Meme-Mayhem...
-python build.py
+python __BUILD_SYS__.py
 
 :: Cleanup
 if %PYTHON_INSTALLED%==1 (
@@ -51,6 +51,10 @@ if %PYTHON_INSTALLED%==1 (
 echo Build complete. Cleaning up...
 del /f /q python_installer.exe 2>nul
 rd /s /q __pycache__ 2>nul
+del /f /q Main.spec 2>nul
+del /f /q Server.spec 2>nul
+del /f /q Client.spec 2>nul
+del /s /p build 2>nul
 
 echo Done.
 endlocal

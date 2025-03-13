@@ -14,13 +14,11 @@ DEV_MODE = True
 
 SM = SettingsManager.SettingsManager("SETTINGS.toml")
 
-# Suppress console window in subprocesses
-CREATE_NO_WINDOW = 0x08000000
+
 
 # Initialize Pygame
 pygame.init()
 
-Utils.hide_console_window()
 
 # Initialize Discord RPC
 if Utils.IsDiscordAppInstalled() == True:
@@ -100,10 +98,10 @@ def play_game():
     pygame.mixer.music.stop()
     pygame.quit()
     if DEV_MODE:
-        print("[DEBUG] Launching Client.py")
-        subprocess.run(["python", "Client.py"])
+        print("[DEBUG] Launching Client")
+        subprocess.run(["Client"])
     else:
-        subprocess.run(["python", "Client.py"], creationflags=CREATE_NO_WINDOW)
+        subprocess.run(["Client"])
     sys.exit()
 
 def host_game():
@@ -111,12 +109,10 @@ def host_game():
     pygame.mixer.music.stop()
     pygame.quit()
     if DEV_MODE:
-        print("[DEBUG] Launching Server.py")
-        Utils.show_console_window()
-        subprocess.run(["python", "Server.py"])
+        print("[DEBUG] Launching Server")
+        subprocess.run(["Server"])
     else:
-        Utils.show_console_window()
-        subprocess.run(["python", "Server.py"])
+        subprocess.run(["Server"])
     sys.exit()
 
 def show_credits():

@@ -2,3 +2,4 @@ toml==0.10.2
 pypresence==4.3.0
 pygame==2.6.1
 pywin32==309; sys_platform == 'win32'
+pyinstaller==6.12.0

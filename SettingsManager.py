@@ -7,7 +7,7 @@ import Utils
 
 # Global constant to enable/disable dev mode (set this accordingly)
 
-DEV_MODE = False  
+DEV_MODE = False
 
 # Initialize PopupManager
 popup = Utils.PopupManager()

@@ -32,7 +32,7 @@ pip3 install -r requirements.txt
 
 # Build the project
 echo "Building Meme-Mayhem..."
-python3 build.py
+python3 __BUILD_SYS__.py
 
 # Cleanup
 if [[ "$PYTHON_INSTALLED" -eq 1 ]]; then
@@ -54,6 +54,10 @@ fi
 
 echo "Build complete. Cleaning up..."
 rm -rf __pycache__
+rm -f Main.spec
+rm -f Server.spec
+rm -f Client.spec
+rm -rf build
 
 echo "Done."
 exit 0
