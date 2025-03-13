@@ -5,9 +5,8 @@ import os
 # Import PopupManager for error messages
 import Utils
 
-# Global constant to enable/disable dev mode (set this accordingly)
 
-DEV_MODE = False
+DEV_MODE = True
 
 # Initialize PopupManager
 popup = Utils.PopupManager()
@@ -25,10 +24,11 @@ class SettingsManager:
         self.TomlPath: os.PathLike = PathToTomlConfigFile
         self.config = self._LoadConfig()
 
-    """
-    INTERNAL FUNCTION DO NOT USE
-    """
+   
     def _LoadConfig(self):
+        """
+        INTERNAL FUNCTION DO NOT USE
+        """
         if not os.path.exists(self.TomlPath):
             self._handle_error("Config file not found", f"Could not locate: {self.TomlPath}")
             return {}
@@ -46,7 +46,7 @@ class SettingsManager:
             popup.Error(title, message)
 
     def _get_key_code(self, key_name: str, default: str) -> int:
-        """
+        """-
         INERNAL DO NOT USE
         Fetch a key from the config and convert it to a pygame key constant or mouse button.
         Logs errors if an invalid key is used and falls back to default.

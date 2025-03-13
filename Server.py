@@ -24,7 +24,7 @@ DEV_MODE = True
 if Utils.IsDiscordAppInstalled() == True:
     RPC = Presence(DISCORD_APP_CLIENT_ID)
     RPC.connect() # Start the handshake loop
-    RPC.update(state="In Main Menu") # Updates our presence
+    RPC.update(state="Runing a Meme Mayhem Server") # Updates our presence
 
 def HANDLE_CONN_ACK(receivedData: Any):
     pass

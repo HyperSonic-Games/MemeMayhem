@@ -26,4 +26,5 @@ class MessageType(Enum):
     DISCONNECT = 11   # Request to terminate connection
     DISCONNECT_ACK = 12 # Acknowledgment of disconnection
 
-
+# HEADERS
+CLIENT_POS_UPDATE = "CLIENT_POS_UPDATE"
