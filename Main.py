@@ -27,8 +27,8 @@ if Utils.IsDiscordAppInstalled() == True:
     RPC.update(state="Rich Presence using pypresence!") # Updates our presence
 
 # Screen settings
-SCREEN_WIDTH = 800
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1500
+SCREEN_HEIGHT = 1000
 pygame.display.set_caption("Meme Mayhem - Main Menu")
 
 # Try enabling VSync, fallback if unsupported
