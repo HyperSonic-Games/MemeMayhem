@@ -1,0 +1,7 @@
+
+# Shoots Subs (The Sandwitch Enstad of bullets)
+Name = "SUB Machine Gun"
+MagSize = 35
+ShotDamage = 5
+Type = "Automatic"
+# On HeadShot Heals The Player You Are Shooting by the same amount as the damage would be Damage 5
