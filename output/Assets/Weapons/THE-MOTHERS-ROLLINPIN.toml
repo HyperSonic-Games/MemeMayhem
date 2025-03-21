@@ -1,6 +1,0 @@
-
-# is also a one shot weapon that can also only be found 4 times
-Name = "THE MOTHERS ROLLING PIN"
-MagSize = 1
-ShotDamage = 200
-Type = "OneUse"

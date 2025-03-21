@@ -1,7 +1,0 @@
-
-# Ak-47
-Name = "Автомат Калашникова"
-ReloadTime = 5
-MagSize = 30 
-ShotDamage = 5
-Type = "Automatic"
