@@ -24,11 +24,11 @@ pygame.init()
 if Utils.IsDiscordAppInstalled() == True:
     RPC = Presence(DISCORD_APP_CLIENT_ID)
     RPC.connect() # Start the handshake loop
-    RPC.update(state="Rich Presence using pypresence!") # Updates our presence
+    RPC.update(state="Playing Meme Mayhem: \nMain Menu") # Updates our presence
 
 # Screen settings
-SCREEN_WIDTH = 1500
-SCREEN_HEIGHT = 1000
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 pygame.display.set_caption("Meme Mayhem - Main Menu")
 
 # Try enabling VSync, fallback if unsupported

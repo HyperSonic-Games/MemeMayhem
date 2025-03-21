@@ -2,7 +2,7 @@ import PyInstaller.__main__
 import os
 import shutil
 
-ICON_PATH = "Assets" + os.pathsep + "Images" + os.pathsep + "IconsAndLogos" + os.pathsep + "MMLogo.ico"
+ICON_PATH = os.path.join("Assets", "Images", "IconsAndLogos", "MMLogo.ico")
 OUTPUT_DIR = "output"
 
 def BuildClient():
