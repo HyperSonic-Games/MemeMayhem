@@ -1,8 +1,8 @@
 import socket
 import time
 from enum import Enum
-import Serializer
-import Messages
+from . import Serializer
+from . import Messages
 
 
 # Helper function for LERP interpolation
@@ -29,25 +29,9 @@ class UdpClient:
         """
         self.ServerAddress = serverAddress
         self.ClientSocket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)  # UDP socket
-        self.LastPosition = (0, 0)
-        self.Velocity = (1, 1)  # Example velocity (dx, dy)
         self.TimeDelta = timeDelta
         self.MsgHandler = msgHandler
         self.serializer = Serializer.Serializer()
-
-    def SendPositionToServer(self, position, velocity):
-        """
-        Send the current player's position to the server.
-        """
-        message = {
-            'TYPE': Messages.MessageType.DATA_PUSH.name,  # Use enum name for message type
-            'HEADER': "CLIENT_POS_UPDATE",
-            'POSITION': position,
-            'VELOCITY': velocity
-        }
-        # Serialize and send the message
-        packet = self.serializer.serialize(message)
-        self.ClientSocket.sendto(packet, self.ServerAddress)
 
     def ReceiveData(self):
         """
@@ -57,19 +41,20 @@ class UdpClient:
         receivedData = self.serializer.deserialize(data)
         self.MsgHandler(receivedData)  # Pass the received data to the handler function
 
+    def SendData(self, data):
+        """
+        Send data to the server.
+
+        Args:
+        - data: Data to send (can be any object that can be serialized).
+        """
+        serializedData = self.serializer.serialize(data)  # Serialize the data
+        self.ClientSocket.sendto(serializedData, self.ServerAddress)  # Send data to the server
+
     def Run(self):
         """
-        Run the UDP client. This sends positions to the server and handles responses.
+        Run the UDP client. This listens for incoming server messages and handles them.
         """
         while True:
-            # Step 1: Predict the position of the player (Dead Reckoning)
-            predictedPosition = DeadReckon(self.LastPosition, self.Velocity, self.TimeDelta)
-
-            # Step 2: Send current predicted position to the server
-            self.SendPositionToServer(predictedPosition, self.Velocity)
-
-            # Step 3: Receive server's position update and handle it with the custom handler
-            self.ReceiveData()
-
-            # Step 4: Sleep for the next frame (simulate the game loop)
-            time.sleep(self.TimeDelta)
+            self.ReceiveData()  # Receive any incoming data from the server
+            time.sleep(self.TimeDelta)  # Wait for the next cycle

@@ -39,9 +39,10 @@ which then do most of the work.
 
 Players = [] # format {name: "", pox_x: 0, pos_y: 0, hp: 100, wep: 0}
 
-# Message Handlers
-def HANDLE_CONN_ACK(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
-    print(f"Connection Acknowledged from {clientAddress}")
+def HANDLE_CONN_ACK(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg  # Unpack the tuple
+    print(f"Connection Acknowledged from {clientAddress} with header: {header}")
+    
     # You can send a response back to the client
     response = {
         'TYPE': 'CONN_ACK',
@@ -49,8 +50,10 @@ def HANDLE_CONN_ACK(receivedData: Any, clientAddress: tuple, server: UDPServer.U
     }
     server.SendToClient(clientAddress, response)
 
-def HANDLE_CONN_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
-    print(f"Connection Request from {clientAddress}")
+def HANDLE_CONN_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg  # Unpack the tuple
+    print(f"Connection Request from {clientAddress} with header: {header}")
+    
     # Process the connection request and send a response
     response = {
         'TYPE': 'CONN_ACK',
@@ -58,38 +61,47 @@ def HANDLE_CONN_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.U
     }
     server.SendToClient(clientAddress, response)
 
-# Other Handlers (you can implement them similarly)
-def HANDLE_AUTH_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+# Other Handlers (adjusting for the tuple structure)
+def HANDLE_AUTH_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_AUTH_SUCCESS(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_AUTH_SUCCESS(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_AUTH_FAIL(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_AUTH_FAIL(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_DATA_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_DATA_REQ(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_DATA_PUSH(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_DATA_PUSH(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-
-def HANDLE_ERROR(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_ERROR(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_PING(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_PING(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_PONG(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_PONG(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-
-def HANDLE_DISCONNECT(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_DISCONNECT(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
 
-def HANDLE_DISCONNECT_ACK(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+def HANDLE_DISCONNECT_ACK(receivedData: Any, clientAddress: tuple, server: UDPServer.UdpServer, msg: tuple):
+    header, additional_data = msg
     pass
+
 
 
 # The Server Class
@@ -98,23 +110,27 @@ class Server:
         self.server_address = server_address
         self.udp_server = UDPServer.UdpServer(server_address, self.message_handler)
 
-    def message_handler(self, message: Any, clientAddress: tuple, server: UDPServer.UdpServer):
-        """
-        Custom message handler to route messages to the correct handler based on message type.
-        """
-        message_type = message.get('TYPE', None)
+def message_handler(self, message: Any, clientAddress: tuple, server: UDPServer.UdpServer):
+    """
+    Custom message handler to route messages to the correct handler based on message type.
+    """
+    # Unpack the tuple
+    header, additional_data = message
 
-        if message_type == 'CONN_ACK':
-            HANDLE_CONN_ACK(message, clientAddress, server)
-        elif message_type == 'CONN_REQ':
-            HANDLE_CONN_REQ(message, clientAddress, server)
-        elif message_type == 'AUTH_REQ':
-            HANDLE_AUTH_REQ(message, clientAddress, server)
-        elif message_type == 'AUTH_SUCCESS':
-            HANDLE_AUTH_SUCCESS(message, clientAddress, server)
-        elif message_type == 'AUTH_FAIL':
-            HANDLE_AUTH_FAIL(message, clientAddress, server)
-        # Add other handlers for additional message types
+    # Assuming the header indicates the message type
+    message_type = header
+
+    if message_type == 'CONN_ACK':
+        HANDLE_CONN_ACK(additional_data, clientAddress, server, message)
+    elif message_type == 'CONN_REQ':
+        HANDLE_CONN_REQ(additional_data, clientAddress, server, message)
+    elif message_type == 'AUTH_REQ':
+        HANDLE_AUTH_REQ(additional_data, clientAddress, server, message)
+    elif message_type == 'AUTH_SUCCESS':
+        HANDLE_AUTH_SUCCESS(additional_data, clientAddress, server, message)
+    elif message_type == 'AUTH_FAIL':
+        HANDLE_AUTH_FAIL(additional_data, clientAddress, server, message)
+    # Add other handlers for additional message types
 
     def run(self):
         """
@@ -126,9 +142,8 @@ class Server:
 def mainloop():
     hostname = socket.gethostname()
     ip_address = socket.gethostbyname(hostname)
-    server_address =(ip_address, 666)
+    server_address =(ip_address, 6969)
     server = Server(server_address)
-
     # Run the server
     server.run()
 
