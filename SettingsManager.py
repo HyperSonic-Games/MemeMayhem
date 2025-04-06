@@ -73,6 +73,7 @@ def main():
         screen.fill((0, 0, 0))  # Clear the screen with black
 
         # Here you would update game logic and render game objects
+        
 
         pygame.display.flip()  # Update the full display Surface to the screen
 
