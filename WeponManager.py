@@ -1,1 +1,2 @@
 import toml
+class Weapon

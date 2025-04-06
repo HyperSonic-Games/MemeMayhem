@@ -3,5 +3,6 @@
 Name = "Автомат Калашникова"
 ReloadTime = 5
 MagSize = 30 
-ShotDamage = 5
+BaseShotDamage = 5
+HeadShotDamage = 15
 Type = "Automatic"
