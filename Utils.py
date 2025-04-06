@@ -1,129 +1,102 @@
-import pyautogui
-import pygame
+import ctypes
+import tkinter as tk
+from tkinter import messagebox, simpledialog
+import platform
+import os
+import sys
+import shutil
 
-# Class to manage popup messages using pyautogui
+# DEV MODE
+DEV_MODE = True
+
+
+# Check if discord is installed
+def IsDiscordAppInstalled() -> bool:
+    """Check if the Discord application is installed based on the OS."""
+    if sys.platform.startswith("win"):
+        # Windows: Check the LocalAppData directory for Discord
+        discord_paths = [
+            os.path.join(os.getenv("LOCALAPPDATA", ""), "Discord"),
+            os.path.join(os.getenv("LOCALAPPDATA", ""), "DiscordCanary"),
+            os.path.join(os.getenv("LOCALAPPDATA", ""), "DiscordPTB"),
+        ]
+        return any(os.path.exists(path) for path in discord_paths)
+
+    elif sys.platform.startswith("linux"):
+        # Linux: Check common locations or use `shutil.which`
+        return any(os.path.exists(path) for path in [
+            "/usr/bin/discord",
+            "/snap/bin/discord",
+            os.path.expanduser("~/.local/bin/discord"),
+        ]) or shutil.which("discord") is not None
+
+    elif sys.platform.startswith("darwin"):
+        # macOS: Check the Applications folder
+        discord_paths = [
+            "/Applications/Discord.app",
+            "/Applications/Discord Canary.app",
+            "/Applications/Discord PTB.app"
+        ]
+        return any(os.path.exists(path) for path in discord_paths)
+
+    return False  # Unknown platform
+
+
 class PopupManager:
+    def __init__(self):
+        self.os_name = platform.system()
+        if self.os_name != "Windows":
+            self.root = tk.Tk()
+            self.root.withdraw()  # Hide the root window
 
-    def Warning(self, Title, Text):
-        # Show a warning message box
-        # Arguments:
-        #   Title (str): The title of the warning message box.
-        #   Text (str): The text content of the warning message.
-        pyautogui.alert(text=Text, title=Title, button='OK')
+        if DEV_MODE:
+            print(f"[DEBUG] PopupManager initialized on {self.os_name}")
 
-    def Info(self, Title, Text):
-        # Show an info message box
-        # Arguments:
-        #   Title (str): The title of the info message box.
-        #   Text (str): The text content of the info message.
-        pyautogui.alert(text=Text, title=Title, button='OK')
-    
-    def Error(self, Title, Text):
-        # Show an error message box
-        # Arguments:
-        #   Title (str): The title of the error message box.
-        #   Text (str): The text content of the error message.
-        pyautogui.alert(text=Text, title=Title, button='OK',)
-    
-    def TextInput(self, Title, Prompt) -> str:
-        # Prompt the user for text input
-        # Arguments:
-        #   Title (str): The title of the text input prompt.
-        #   Prompt (str): The text prompt asking for user input.
-        # Returns:
-        #   str: The user's input as a string.
-        return pyautogui.prompt(text=Prompt, title=Title, default='')
+    def _windows_messagebox(self, title: str, text: str, icon: str) -> None:
+        """Show a Windows native message box using ctypes."""
+        icons = {
+            "info": 0x40,     # MB_ICONINFORMATION
+            "warning": 0x30,  # MB_ICONWARNING
+            "error": 0x10     # MB_ICONERROR
+        }
+        result = ctypes.windll.user32.MessageBoxW(0, text, title, icons.get(icon, 0))
+        
+        if DEV_MODE:
+            print(f"[DEBUG] Windows MessageBox ({icon}) -> Title: '{title}', Text: '{text}', Result: {result}")
 
+    def Warning(self, Title: str, Text: str) -> None:
+        """Show a warning message box."""
+        if DEV_MODE:
+            print(f"[DEBUG] Warning: {Title} - {Text}")
 
+        if self.os_name == "Windows":
+            self._windows_messagebox(Title, Text, "warning")
+        else:
+            messagebox.showwarning(Title, Text)
 
+    def Info(self, Title: str, Text: str) -> None:
+        """Show an info message box."""
+        if DEV_MODE:
+            print(f"[DEBUG] Info: {Title} - {Text}")
 
+        if self.os_name == "Windows":
+            self._windows_messagebox(Title, Text, "info")
+        else:
+            messagebox.showinfo(Title, Text)
 
-# A dictionary mapping string key values to pygame key constants
-KEY_MAP = {
-    # Letters
-    "a": pygame.K_a,
-    "b": pygame.K_b,
-    "c": pygame.K_c,
-    "d": pygame.K_d,
-    "e": pygame.K_e,
-    "f": pygame.K_f,
-    "g": pygame.K_g,
-    "h": pygame.K_h,
-    "i": pygame.K_i,
-    "j": pygame.K_j,
-    "k": pygame.K_k,
-    "l": pygame.K_l,
-    "m": pygame.K_m,
-    "n": pygame.K_n,
-    "o": pygame.K_o,
-    "p": pygame.K_p,
-    "q": pygame.K_q,
-    "r": pygame.K_r,
-    "s": pygame.K_s,
-    "t": pygame.K_t,
-    "u": pygame.K_u,
-    "v": pygame.K_v,
-    "w": pygame.K_w,
-    "x": pygame.K_x,
-    "y": pygame.K_y,
-    "z": pygame.K_z,
+    def Error(self, Title: str, Text: str) -> None:
+        """Show an error message box."""
+        if DEV_MODE:
+            print(f"[DEBUG] Error: {Title} - {Text}")
 
-    # Numbers
-    "0": pygame.K_0,
-    "1": pygame.K_1,
-    "2": pygame.K_2,
-    "3": pygame.K_3,
-    "4": pygame.K_4,
-    "5": pygame.K_5,
-    "6": pygame.K_6,
-    "7": pygame.K_7,
-    "8": pygame.K_8,
-    "9": pygame.K_9,
+        if self.os_name == "Windows":
+            self._windows_messagebox(Title, Text, "error")
+        else:
+            messagebox.showerror(Title, Text)
 
-    # Function Keys
-    "F1": pygame.K_F1,
-    "F2": pygame.K_F2,
-    "F3": pygame.K_F3,
-    "F4": pygame.K_F4,
-    "F5": pygame.K_F5,
-    "F6": pygame.K_F6,
-    "F7": pygame.K_F7,
-    "F8": pygame.K_F8,
-    "F9": pygame.K_F9,
-    "F10": pygame.K_F10,
-    "F11": pygame.K_F11,
-    "F12": pygame.K_F12,
+    def TextInput(self, Title: str, Prompt: str) -> str | None:
+        """Prompt the user for text input."""
+        if DEV_MODE:
+            print(f"[DEBUG] TextInput Prompt: {Title} - {Prompt}")
 
-    # Arrow Keys
-    "Up": pygame.K_UP,
-    "Down": pygame.K_DOWN,
-    "Left": pygame.K_LEFT,
-    "Right": pygame.K_RIGHT,
-
-    # Special Keys
-    "Space": pygame.K_SPACE,
-    "Enter": pygame.K_RETURN,
-    "Shift": pygame.K_LSHIFT,
-    "Ctrl": pygame.K_LCTRL,
-    "Alt": pygame.K_LALT,
-    "Tab": pygame.K_TAB,
-    "Backspace": pygame.K_BACKSPACE,
-    "Esc": pygame.K_ESCAPE,
-
-    # Mouse Buttons
-    "LMB": pygame.BUTTON_LEFT,    # Left Mouse Button
-    "RMB": pygame.BUTTON_RIGHT,   # Right Mouse Button
-    "MMB": pygame.BUTTON_MIDDLE,  # Middle Mouse Button
-}
-
-def TranslateToPygameKey(key_str):
-    """
-    Translate a key string from settings into the corresponding Pygame key constant.
-    
-    Args:
-        key_str (str): The key as a string from the settings (e.g., "w", "a", "LMB").
-    
-    Returns:
-        int: The corresponding Pygame key constant (e.g., pygame.K_w), or None if not found.
-    """
-    return KEY_MAP.get(key_str, None)  # Return None if the key is not found
+        return simpledialog.askstring(Title, Prompt)
