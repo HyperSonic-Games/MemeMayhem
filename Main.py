@@ -6,6 +6,7 @@ import random
 from pypresence import Presence
 import Utils
 import SettingsManager
+import os
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
@@ -65,6 +66,12 @@ def load_splash_text():
         return "Welcome!"
 
 SPLASH_TEXT = load_splash_text()
+
+# Meme Mayhem logo
+MM_Logo = pygame.image.load("Assets/Images/IconsAndLogos/MemeMayhemLogo.png")
+
+
+
 
 # ---- Dynamic Font Scaling ----
 def get_scaled_font(size_factor=15):
@@ -157,11 +164,18 @@ def main_menu():
         splash_rect = splash_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 10))
         SCREEN.blit(splash_surface, splash_rect)
 
+              
+
         # Draw buttons
         for button in MAIN_MENU_BUTTONS:
             button.draw(SCREEN)
+
+        # Draw image
+        SCREEN.blit(MM_Logo, (100, 100))
 
         pygame.display.flip()
 
 if __name__ == "__main__":
     main_menu()
+
+
