@@ -22,14 +22,19 @@ width, height = 800, 600
 screen = pygame.display.set_mode((width, height))
 clock = pygame.time.Clock()
 
+pm = PopupManager()
+
 # Player settings
 player_color = (0, 128, 255)
 player_x, player_y = 100, 100
 player_speed = 5
-player_name = PopupManager.TextInput("Username", "Enter Username:")
+player_name = pm.TextInput("Username", "Enter Username:")
+
 
 hostname = socket.gethostname()
 ip_address = socket.gethostbyname(hostname)
+if DEV_MODE:
+    print(f"[DEBUG] IP: {ip_address}")
 
 def msg_handler(receivedData: Any):
     pass  # Handle incoming messages here
