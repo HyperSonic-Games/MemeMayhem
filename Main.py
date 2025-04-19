@@ -8,6 +8,8 @@ import Utils
 import SettingsManager
 import os
 
+
+
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
 # DEV MODE
@@ -30,17 +32,23 @@ if Utils.IsDiscordAppInstalled() == True:
 # Screen settings
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-pygame.display.set_caption("Meme Mayhem - Main Menu")
+
+
+if DEV_MODE:
+    pygame.display.set_caption("Meme Mayhem (DEV_MODE) - Main Menu")
+else:
+    pygame.display.set_caption("Meme Mayhem - Main Menu")
+
 
 # Try enabling VSync, fallback if unsupported
 try:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), vsync=1)
     if DEV_MODE:
-        print("[DEBUG] VSync Renderer Created")
+        print("[DEBUG] VSync Renderer Created\n")
 except Exception as e:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     if DEV_MODE:
-        print(f"[DEBUG] Normal Renderer Created - Error: {e}")
+        print(f"[DEBUG] Normal Renderer Created - Error: {e}\n")
 
 # Colors
 GRAY = (50, 50, 50)
