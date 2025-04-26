@@ -1,1 +1,3 @@
 import toml
+
+import Config

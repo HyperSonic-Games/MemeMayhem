@@ -1,5 +1,3 @@
-
-# A machinegun that when fired the enemy is stuned an deals a small amount of damge when stuned
 Name = "Chewiecatt's machinegun"
 Type = "Automatic" 
 ReloadTime = 6.5

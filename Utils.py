@@ -6,8 +6,10 @@ import os
 import sys
 import shutil
 
+import Config
+
 # DEV MODE
-DEV_MODE = True
+DEV_MODE = Config.DEV_MODE
 
 
 # Check if discord is installed

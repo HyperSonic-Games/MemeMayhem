@@ -1,0 +1,133 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+<xs:complexType name="ERROR_TYPE">
+    <xs:simpleContent>
+        <xs:extension base="xs:string">
+            <xs:attribute name="USR_NAME" type="xs:string"/>
+        </xs:extension>
+    </xs:simpleContent>
+</xs:complexType>
+
+    <xs:element name="MEME_MAYHEM_PACKET">
+        <xs:complexType>
+            <xs:sequence>
+                <xs:element name="HEADER">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="TIMESTAMP" type="xs:dateTime"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="SERVER_BROADCAST">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="DATA">
+                                <xs:complexType>
+                                    <xs:sequence>
+
+                                        <xs:element name="SOUNDS" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="GLOBAL_SOUND">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="NAME" type="xs:string"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                    <xs:element name="SOUND" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="NAME" type="xs:string"/>
+                                                                <xs:element name="POS_X" type="xs:float"/>
+                                                                <xs:element name="POS_Y" type="xs:float"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                        <xs:element name="PLAYERS" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="PLAYER_UPDATE" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="USERNAME" type="xs:string"/>
+                                                                <xs:element name="POS_X" type="xs:float"/>
+                                                                <xs:element name="POS_Y" type="xs:float"/>
+                                                                <xs:element name="HP" type="xs:integer"/>
+                                                                <xs:element name="AMMO" type="xs:integer"/>
+                                                                <xs:element name="WEAPON" type="xs:string"/>
+                                                                <xs:element name="PLAYER_STATS" minOccurs="0">
+                                                                    <xs:complexType>
+                                                                        <xs:sequence>
+                                                                            <xs:element name="KILLS" type="xs:integer"/>
+                                                                            <xs:element name="DEATHS" type="xs:integer"/>
+                                                                        </xs:sequence>
+                                                                    </xs:complexType>
+                                                                </xs:element>
+                                                            </xs:sequence>
+                                                            <xs:attribute name="PLAYER_NAME" type="xs:string" use="required"/>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                        <xs:element name="CHATS" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="CHAT" maxOccurs="unbounded">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="SENDER" type="xs:string"/>
+                                                                <xs:element name="MESSAGE" type="xs:string"/>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+
+
+
+                                        <xs:element name="SERVER_COMMAND">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="SERVER_OFF" type="xs:boolean"/>
+                                                    <xs:element name="DISCONNECT" type="xs:boolean"/>
+                                                    <xs:element name="ERRORS">
+                                                        <xs:complexType>
+                                                            <xs:sequence>
+                                                                <xs:element name="ERROR" type="ERROR_TYPE"></xs:element>
+                                                            </xs:sequence>
+                                                        </xs:complexType>
+                                                    </xs:element>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                        <xs:element name="EVENT_LOG" minOccurs="0">
+                                            <xs:complexType>
+                                                <xs:sequence>
+                                                    <xs:element name="EVENT" type="xs:string" maxOccurs="unbounded"/>
+                                                </xs:sequence>
+                                            </xs:complexType>
+                                        </xs:element>
+
+                                    </xs:sequence>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+            </xs:sequence>
+        </xs:complexType>
+    </xs:element>
+
+</xs:schema>

@@ -8,6 +8,8 @@ import Utils
 import SettingsManager
 import os
 
+import Config
+
 
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"

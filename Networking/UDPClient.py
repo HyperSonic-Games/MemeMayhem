@@ -13,6 +13,6 @@ class UDPClient:
             return data
         except socket.timeout:
             return None
-
+    
     def close(self):
         self.sock.close()

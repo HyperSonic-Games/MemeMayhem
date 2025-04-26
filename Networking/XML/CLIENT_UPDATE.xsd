@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <xs:element name="MEME_MAYHEM_PACKET">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="HEADER">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="TIMESTAMP" type="xs:string" minOccurs="1"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+        <xs:element name="CLIENT_UPDATE">
+          <xs:complexType>
+            <xs:sequence>
+
+              <!-- SOUND (Optional) -->
+              <xs:element name="SOUND" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="NAME" type="xs:string"/>
+                    <xs:element name="POS_X" type="xs:float"/>
+                    <xs:element name="POS_Y" type="xs:float"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <!-- PLAYER_DATA (Required) -->
+              <xs:element name="PLAYER_DATA">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="USERNAME" type="xs:string"/>
+                    <xs:element name="POS_X" type="xs:float"/>
+                    <xs:element name="POS_Y" type="xs:float"/>
+                    <xs:element name="HP" type="xs:int"/>
+                    <xs:element name="AMMO" type="xs:int"/>
+                    <xs:element name="WEAPON" type="xs:string"/>
+                    <xs:element name="PLAYER_STAT">
+                      <xs:complexType>
+                        <xs:sequence>
+                          <xs:element name="KILLS" type="xs:int"/>
+                          <xs:element name="DEATHS" type="xs:int"/>
+                        </xs:sequence>
+                      </xs:complexType>
+                    </xs:element>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <!-- WEAPON_SHOT (Optional) -->
+              <xs:element name="WEAPON_SHOT" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element name="ANGLE" type="xs:float"/>
+                    <xs:element name="WEAPON_DATA" type="xs:string"/>
+                  </xs:sequence>
+                </xs:complexType>
+              </xs:element>
+
+              <!-- CHAT_MESSAGE (Optional) -->
+              <xs:element name="CHAT_MESSAGE" type="xs:string" minOccurs="0"/>
+
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+
+</xs:schema>

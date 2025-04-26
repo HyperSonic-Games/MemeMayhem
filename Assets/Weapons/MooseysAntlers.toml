@@ -1,7 +1,5 @@
-
-# Dual knives
 Name = "moosey's antlers" 
 MagSize = 1
 BaseShotDamage = 25
-HeasShotDamage = 35
-Type = "melee"
+HeadshotDamage = 35
+type = "Melee"
