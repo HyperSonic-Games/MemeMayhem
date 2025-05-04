@@ -15,7 +15,6 @@ import Config
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
 # DEV MODE
-DEV_MODE = True
 
 SM = SettingsManager.SettingsManager("SETTINGS.toml")
 
@@ -23,34 +22,34 @@ SM = SettingsManager.SettingsManager("SETTINGS.toml")
 
 # Initialize Pygame
 pygame.init()
-
+Utils.debug_log("PYGAME_INIT", "Pygame initialized")
 
 # Initialize Discord RPC
-if Utils.IsDiscordAppInstalled() == True:
-    RPC = Presence(DISCORD_APP_CLIENT_ID)
-    RPC.connect() # Start the handshake loop
-    RPC.update(state="Playing Meme Mayhem: \nMain Menu") # Updates our presence
+if Utils.IsDiscordAppInstalled():
+    try:
+        RPC = Presence(DISCORD_APP_CLIENT_ID)
+        RPC.connect()
+        RPC.update(state="Playing Meme Mayhem: \nMain Menu")
+        Utils.debug_log("DISCORD", "Discord RPC Connected and Presence Set")
+    except Exception as e:
+        Utils.error_log("DISCORD", f"Failed to initialize Discord RPC: {e}")
 
 # Screen settings
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
-
-if DEV_MODE:
-    pygame.display.set_caption("Meme Mayhem (DEV_MODE) - Main Menu")
-else:
-    pygame.display.set_caption("Meme Mayhem - Main Menu")
-
+# Window title
+pygame.display.set_caption(
+    "Meme Mayhem (DEV_MODE) - Main Menu" if Config.DEV_MODE else "Meme Mayhem - Main Menu"
+)
 
 # Try enabling VSync, fallback if unsupported
 try:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), vsync=1)
-    if DEV_MODE:
-        print("[DEBUG] VSync Renderer Created\n")
+    Utils.debug_log("PYGAME_RENDERER", "VSync Renderer Created")
 except Exception as e:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    if DEV_MODE:
-        print(f"[DEBUG] Normal Renderer Created - Error: {e}\n")
+    Utils.error_log("PYGAME_RENDERER", f"VSync failed, fallback to normal: {e}")
 
 # Colors
 GRAY = (50, 50, 50)
@@ -65,27 +64,44 @@ BUTTON_SPACING = 20
 
 # ---- Load Splash Text from File ----
 def load_splash_text():
-    """Load a random splash text from file."""
+    path = os.path.join("Assets", "splash.txt")
     try:
-        with open("Assets/splash.txt", "r", encoding="utf-8") as file:
+        with open(path, "r", encoding="utf-8") as file:
             lines = [line.strip() for line in file if line.strip()]
+            Utils.debug_log("FILE_LOADER", f"Loaded splash text file: {os.path.abspath(path)}")
             return random.choice(lines) if lines else "Welcome!"
     except FileNotFoundError:
-        if DEV_MODE:
-            print("[DEBUG] Splash text file not found!")
+        Utils.warn_log("FILE_LOADER", f"Splash text file not found at: {os.path.abspath(path)}")
+        return "Welcome To Meme Mayhem!"
+    except Exception as e:
+        Utils.error_log("FILE_LOADER", f"Unexpected error reading splash text: {e}")
         return "Welcome!"
 
 SPLASH_TEXT = load_splash_text()
 
-# Meme Mayhem logo
-MM_Logo = pygame.image.load("Assets/Images/IconsAndLogos/MemeMayhemLogo.png")
+# ---- Load Logo Image ----
+def load_logo():
+    path = os.path.join("Assets", "Images", "IconsAndLogos", "MemeMayhemLogo.png")
+    try:
+        logo = pygame.image.load(path)
+        Utils.debug_log("FILE_LOADER", f"Loaded logo image from: {os.path.abspath(path)}")
+        return logo
+    except FileNotFoundError:
+        Utils.warn_log("FILE_LOADER", f"Logo image not found at: {os.path.abspath(path)}")
+    except pygame.error as e:
+        Utils.error_log("FILE_LOADER", f"Pygame image load failed: {e}")
+    except Exception as e:
+        Utils.error_log("FILE_LOADER", f"Unknown error loading logo: {e}")
 
+    # fallback logo
+    fallback = pygame.Surface((100, 100))
+    fallback.fill(RED)
+    return fallback
 
-
+MM_Logo = load_logo()
 
 # ---- Dynamic Font Scaling ----
 def get_scaled_font(size_factor=15):
-    """Dynamically scale font size based on screen width."""
     font_size = SCREEN_WIDTH // size_factor
     return pygame.font.Font(None, font_size)
 
@@ -94,8 +110,8 @@ class Button:
         self.rect = pygame.Rect(x, y, width, height)
         self.color = color
         self.text = text
-        self.font = get_scaled_font(20)  # Scale button text dynamically
-        self.action = action  # Store function reference
+        self.font = get_scaled_font(20)
+        self.action = action
 
     def draw(self, surface):
         pygame.draw.rect(surface, self.color, self.rect)
@@ -105,37 +121,27 @@ class Button:
             surface.blit(text_surface, text_rect)
 
     def click(self):
-        """Execute the button's assigned action."""
         if self.action:
+            Utils.debug_log("UI_BUTTON_CLICK", f"Executing action for: {self.text}")
             self.action()
 
 # ---- Button Actions ----
 def play_game():
-    """Launch the client."""
     pygame.mixer.music.stop()
     pygame.quit()
-    if DEV_MODE:
-        print("[DEBUG] Launching Client")
-        subprocess.run(["Client"])
-    else:
-        subprocess.run(["Client"])
+    Utils.debug_log("LAUNCHER", "Launching Client")
+    subprocess.run(["Client"])
     sys.exit()
 
 def host_game():
-    """Launch the server."""
     pygame.mixer.music.stop()
     pygame.quit()
-    if DEV_MODE:
-        print("[DEBUG] Launching Server")
-        subprocess.run(["Server"])
-    else:
-        subprocess.run(["Server"])
+    Utils.debug_log("LAUNCHER", "Launching Server")
+    subprocess.run(["Server"])
     sys.exit()
 
 def show_credits():
-    """Show credits (placeholder)."""
-    if DEV_MODE:
-        print("[DEBUG] Credits button clicked - Feature not implemented yet.")
+    Utils.debug_log("UI_CALLBACK", "Credits button clicked - Feature not implemented yet.")
 
 # ---- Create Buttons ----
 MAIN_MENU_BUTTONS = [
@@ -145,18 +151,27 @@ MAIN_MENU_BUTTONS = [
 ]
 
 def main_menu():
-    """Display the main menu."""
+    # Load music
+    music_path = os.path.join("Assets", "Sound", "Prisoner.mp3")
     try:
-        pygame.mixer.music.load("Assets/Sound/Prisoner.mp3")
-        pygame.mixer.music.play(-1)  # Loop indefinitely
+        pygame.mixer.music.load(music_path)
+        pygame.mixer.music.play(-1)
+        Utils.debug_log("FILE_LOADER", f"Loaded and playing music from: {os.path.abspath(music_path)}")
+    except FileNotFoundError:
+        Utils.warn_log("FILE_LOADER", f"Music file not found at: {os.path.abspath(music_path)}")
     except pygame.error as e:
-        if DEV_MODE:
-            print(f"[DEBUG] Failed to load music: {e}")
+        Utils.error_log("FILE_LOADER", f"Failed to load music: {e}")
+    except Exception as e:
+        Utils.error_log("FILE_LOADER", f"Unknown error loading music: {e}")
 
-    splash_font = get_scaled_font(21)  # Splash text should be larger
+    splash_font = get_scaled_font(21)
 
     while True:
         for event in pygame.event.get():
+            # Only log non-mouse movement events
+            if event.type not in [pygame.MOUSEMOTION]:  # Exclude mouse movement
+                Utils.debug_log("PYGAME_EVENTS", event)
+
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
@@ -164,28 +179,24 @@ def main_menu():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 for button in MAIN_MENU_BUTTONS:
                     if button.rect.collidepoint(event.pos):
-                        button.click()  # Execute associated function
+                        button.click()
 
         # Render UI
         SCREEN.fill(GRAY)
 
-        # Draw splash text at the top center
+        # Splash text
         splash_surface = splash_font.render(SPLASH_TEXT, True, WHITE)
         splash_rect = splash_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 10))
         SCREEN.blit(splash_surface, splash_rect)
 
-              
-
-        # Draw buttons
+        # Buttons
         for button in MAIN_MENU_BUTTONS:
             button.draw(SCREEN)
 
-        # Draw image
+        # Logo
         SCREEN.blit(MM_Logo, (100, 100))
 
         pygame.display.flip()
 
 if __name__ == "__main__":
     main_menu()
-
-

@@ -9,7 +9,26 @@ import shutil
 import Config
 
 # DEV MODE
-DEV_MODE = Config.DEV_MODE
+Config.DEV_MODE
+
+# ---- Logging Functions ----
+def debug_log(tag, message):
+    if Config.DEV_MODE:
+        print(f"[DEBUG/{tag}] {message}")
+
+def warn_log(tag, message):
+    if Config.DEV_MODE:
+        print(f"[WARN/{tag}] {message}")
+    else:
+        pm = PopupManager(no_init_msg=True)
+        pm.Warning(tag, message)
+
+def error_log(tag, message):
+    if Config.DEV_MODE:
+        print(f"[ERROR/{tag}] {message}")
+    else:
+        pm = PopupManager(no_init_msg=True)
+        pm.Error(tag, message)
 
 
 # Check if discord is installed
@@ -45,14 +64,14 @@ def IsDiscordAppInstalled() -> bool:
 
 
 class PopupManager:
-    def __init__(self):
+    def __init__(self, no_init_msg=False):
         self.os_name = platform.system()
         if self.os_name != "Windows":
             self.root = tk.Tk()
             self.root.withdraw()  # Hide the root window
 
-        if DEV_MODE:
-            print(f"[DEBUG] PopupManager initialized on {self.os_name}")
+            if no_init_msg == False:
+                debug_log("PopupManager", f"Initialized on {self.os_name}")
 
     def _windows_messagebox(self, title: str, text: str, icon: str) -> None:
         """Show a Windows native message box using ctypes."""
