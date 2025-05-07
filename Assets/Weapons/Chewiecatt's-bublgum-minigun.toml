@@ -1,6 +1,6 @@
 Name = "Chewiecatt's machinegun"
-Type = "Automatic" 
 ReloadTime = 6.5
 MagSize = 100
 BaseShotDamage = 3
 HeadShotDamage = 13
+Type = "Automatic" 
