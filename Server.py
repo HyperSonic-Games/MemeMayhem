@@ -1,8 +1,9 @@
 import Utils
 import Config
-from pypresence import Presence
+import pypresence
 from NetCode.Networking import UDPServer
 
+VERSION = "0.0.1-alpha"
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
@@ -11,7 +12,7 @@ pm = Utils.PopupManager()
 # Initialize Discord RPC
 if Utils.IsDiscordAppInstalled():
     try:
-        RPC = Presence(DISCORD_APP_CLIENT_ID)
+        RPC = pypresence.Presence(DISCORD_APP_CLIENT_ID)
         RPC.connect()
         RPC.update(state="Running a Meme Mayhem Server")
         Utils.debug_log("DISCORD", "Discord RPC Connected and Presence Set")
@@ -71,6 +72,9 @@ print(f"{RED}{SERVER_HEADER}{RESET}")
 # NOTE: if you change this the game could get unstable
 SERVER_MAX_PLAYERS = 15
 
+print(f"[MEME_MAYHEM/SERVER]: <SERVER_INFO> ~ Using Pypresence Version: {pypresence.__version__}")
+print(f"[MEME_MAYHEM/SERVER]: <SERVER_INFO> ~ Server Version: {VERSION}\n\n\n")
+
 print("[MEME_MAYHEM/SERVER]: <SERVER_INIT> ~ Initializing server...")
 
-Server = UDPServer.UDPServer()
+Server = UDPServer.UDPServer(server_msg_parser)
