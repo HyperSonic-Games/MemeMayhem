@@ -1,6 +1,7 @@
 import PyInstaller.__main__
 import os
 import shutil
+import subprocess
 
 ICON_PATH = os.path.join("Assets", "Images", "IconsAndLogos", "MMLogo.ico")
 OUTPUT_DIR = "output"
@@ -82,3 +83,19 @@ BuildServer()
 
 # Copy files
 CopyFiles()
+
+if BUILD_DOCS:
+    process = subprocess.Popen(
+    ["naturaldocs", "-p", "ND Config"],
+    stdout=subprocess.PIPE,  # Capture standard output
+    stderr=subprocess.PIPE,  # Capture standard error
+    stdin=subprocess.PIPE   # Allow sending input to the process (if needed)
+    )
+    # Read output and error
+    stdout, stderr = process.communicate()
+    
+    # Check if there are any errors
+    if stderr:
+        print("Error during Natural Docs execution:", stderr.decode())
+    else:
+        print("Natural Docs completed successfully.")
