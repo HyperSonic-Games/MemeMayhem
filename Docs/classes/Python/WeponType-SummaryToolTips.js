@@ -1,1 +1,0 @@
-﻿NDSummary.OnToolTipsLoaded("PythonClass:WeponType",{31:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype31\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">WeponType</div></div></div><div class=\"TTSummary\">Represents the category/type of a weapon.</div></div>"});

@@ -1,1 +1,0 @@
-﻿NDSummary.OnToolTipsLoaded("File:Client.py",{2:"<div class=\"NDToolTip TConstant LPython\"><div class=\"TTSummary\">The Client ID used for Discord RPC (Rich Presence) integration.</div></div>"});

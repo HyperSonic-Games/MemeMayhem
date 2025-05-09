@@ -1,1 +1,0 @@
-﻿NDMenu.OnSectionLoaded("classes.js",[[1,"PopupManager"],[1,"Wepon"],[1,"WeponType"]]);

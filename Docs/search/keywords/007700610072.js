@@ -1,1 +1,0 @@
-﻿NDSearch.OnPrefixDataLoaded("war",["Function"],[["warn_log",,[[,,,,0,"File:Utils.py:warn_log"]]],["Warning",,[["PopupManager",,,,0,"File:Utils.py:PopupManager.Warning","PythonClass:PopupManager:Warning"]]]]);

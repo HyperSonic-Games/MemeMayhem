@@ -1,1 +1,0 @@
-﻿NDSearch.OnPrefixDataLoaded("loa",["Function"],[["load_logo",,[[,,,,0,"File:Main.py:load_logo"]]],["load_splash_text",,[[,,,,0,"File:Main.py:load_splash_text"]]]]);

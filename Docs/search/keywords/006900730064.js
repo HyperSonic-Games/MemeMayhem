@@ -1,1 +1,0 @@
-﻿NDSearch.OnPrefixDataLoaded("isd",["Function"],[["IsDiscordAppInstalled",,[[,,,,0,"File:Utils.py:IsDiscordAppInstalled"]]]]);
