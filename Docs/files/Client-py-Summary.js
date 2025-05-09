@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("File:Client.py","Client.py");NDSummary.OnSummaryLoaded("File:Client.py",[["Python","Python"]],[["Constants","Constant"],["Groups","Group"]],[[1,0,1,"Constants","Constants"],[2,0,0,"DISCORD_APP_CLIENT_ID","DISCORD_APP_CLIENT_ID"]]);
