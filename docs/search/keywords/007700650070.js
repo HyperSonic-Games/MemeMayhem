@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("wep",["Class"],[["Wepon",,[[,,,,0,"File:WeponManager.py:Wepon","PythonClass:Wepon"]]],["WeponType",,[[,,,,0,"File:WeponManager.py:WeponType","PythonClass:WeponType"]]]]);

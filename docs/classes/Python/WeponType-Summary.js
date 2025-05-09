@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:WeponType","WeponType");NDSummary.OnSummaryLoaded("PythonClass:WeponType",[["Python","Python"]],[["Classes","Class"]],[[31,0,0,"WeponType"]]);

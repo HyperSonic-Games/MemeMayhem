@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("pop",["Class"],[["PopupManager",,[[,,,,0,"File:Utils.py:PopupManager","PythonClass:PopupManager"]]]]);

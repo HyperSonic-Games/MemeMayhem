@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("tex",["Function"],[["TextInput",,[["PopupManager",,,,0,"File:Utils.py:PopupManager.TextInput","PythonClass:PopupManager:TextInput"]]]]);
