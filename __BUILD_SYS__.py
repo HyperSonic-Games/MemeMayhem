@@ -5,6 +5,7 @@ import shutil
 ICON_PATH = os.path.join("Assets", "Images", "IconsAndLogos", "MMLogo.ico")
 OUTPUT_DIR = "output"
 DEV_MODE = True  # Toggle this for dev vs prod
+BUILD_DOCS = True
 
 def WriteConfig():
     """Safely updates or writes Config.py with the DEV_MODE setting, preserving the header comment."""

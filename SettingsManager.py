@@ -1,12 +1,12 @@
 import toml
 import pygame
 import os
+import Config
 
 # Import PopupManager for error messages
 import Utils
 
 
-DEV_MODE = True
 
 # Initialize PopupManager
 popup = Utils.PopupManager()
@@ -40,10 +40,7 @@ class SettingsManager:
         INERNAL DO NOT USE
         Handles errors based on DEV_MODE setting.
         """
-        if DEV_MODE:
-            print(f"[ERROR] {title}: {message}")
-        else:
-            popup.Error(title, message)
+        Utils.error_log(title, message)
 
     def _get_key_code(self, key_name: str, default: str) -> int:
         """-

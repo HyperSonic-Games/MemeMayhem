@@ -10,21 +10,21 @@ import os
 
 import Config
 
-
-
+# Constant: DISCORD_APP_CLIENT_ID
+# The Client ID used for Discord RPC (Rich Presence) integration.
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
 # DEV MODE
-
+# Initializes the settings manager for loading the game's settings from a TOML file.
 SM = SettingsManager.SettingsManager("SETTINGS.toml")
 
-
-
 # Initialize Pygame
+# Initializes Pygame and logs the successful initialization.
 pygame.init()
 Utils.debug_log("PYGAME_INIT", "Pygame initialized")
 
 # Initialize Discord RPC
+# Sets up the Discord Rich Presence integration to show the game's status on Discord.
 if Utils.IsDiscordAppInstalled():
     try:
         RPC = Presence(DISCORD_APP_CLIENT_ID)
@@ -35,15 +35,18 @@ if Utils.IsDiscordAppInstalled():
         Utils.error_log("DISCORD", f"Failed to initialize Discord RPC: {e}")
 
 # Screen settings
+# Sets up the screen width and height for the main menu window.
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 
 # Window title
+# Sets the window title based on whether DEV_MODE is enabled in the config.
 pygame.display.set_caption(
     "Meme Mayhem (DEV_MODE) - Main Menu" if Config.DEV_MODE else "Meme Mayhem - Main Menu"
 )
 
 # Try enabling VSync, fallback if unsupported
+# Attempts to enable VSync for smoother rendering, with a fallback if VSync is unsupported.
 try:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), vsync=1)
     Utils.debug_log("PYGAME_RENDERER", "VSync Renderer Created")
@@ -52,17 +55,29 @@ except Exception as e:
     Utils.error_log("PYGAME_RENDERER", f"VSync failed, fallback to normal: {e}")
 
 # Colors
+# Defines commonly used colors in RGB format for UI elements.
 GRAY = (50, 50, 50)
 WHITE = (255, 255, 255)
 NAVY_BLUE = (0, 0, 128)
 RED = (255, 0, 0)
 
 # Button settings
+# Configures the size and spacing for the buttons in the main menu.
 BUTTON_WIDTH = 200
 BUTTON_HEIGHT = 50
 BUTTON_SPACING = 20
 
-# ---- Load Splash Text from File ----
+# Function: load_splash_text
+# Loads a random splash text from a text file located in the "Assets" directory.
+#
+# Parameters:
+#     None
+#
+# Returns:
+#     string - A randomly selected line from the splash text file, or a default message if the file cannot be loaded.
+#
+# Notes:
+#     If the splash text file is not found or there is an error reading it, a fallback message will be used.
 def load_splash_text():
     path = os.path.join("Assets", "splash.txt")
     try:
@@ -77,9 +92,20 @@ def load_splash_text():
         Utils.error_log("FILE_LOADER", f"Unexpected error reading splash text: {e}")
         return "Welcome!"
 
+# Loads the splash text to be displayed at the top of the main menu.
 SPLASH_TEXT = load_splash_text()
 
-# ---- Load Logo Image ----
+# Function: load_logo
+# Loads the logo image from the "Assets" directory.
+#
+# Parameters:
+#     None
+#
+# Returns:
+#     pygame.Surface - The loaded logo image, or a fallback surface if the logo cannot be loaded.
+#
+# Notes:
+#     If the logo file is not found or there is an error loading it, a red fallback surface will be used.
 def load_logo():
     path = os.path.join("Assets", "Images", "IconsAndLogos", "MemeMayhemLogo.png")
     try:
@@ -98,13 +124,22 @@ def load_logo():
     fallback.fill(RED)
     return fallback
 
+# Loads the Meme Mayhem logo image for display in the main menu.
 MM_Logo = load_logo()
 
-# ---- Dynamic Font Scaling ----
+# Function: get_scaled_font
+# Dynamically scales the font size based on the screen width to maintain UI consistency.
+#
+# Parameters:
+#     size_factor - Factor for determining the font size (default is 15).
+#
+# Returns:
+#     pygame.font.Font - A Pygame font object with the calculated font size.
 def get_scaled_font(size_factor=15):
     font_size = SCREEN_WIDTH // size_factor
     return pygame.font.Font(None, font_size)
 
+# Button class: Defines the structure and behavior of a UI button in the main menu.
 class Button:
     def __init__(self, x, y, width, height, color, text='', action=None):
         self.rect = pygame.Rect(x, y, width, height)
@@ -114,6 +149,7 @@ class Button:
         self.action = action
 
     def draw(self, surface):
+        # Draws the button on the given surface.
         pygame.draw.rect(surface, self.color, self.rect)
         if self.text:
             text_surface = self.font.render(self.text, True, WHITE)
@@ -121,12 +157,16 @@ class Button:
             surface.blit(text_surface, text_rect)
 
     def click(self):
+        # Executes the action associated with the button when clicked.
         if self.action:
             Utils.debug_log("UI_BUTTON_CLICK", f"Executing action for: {self.text}")
             self.action()
 
 # ---- Button Actions ----
+# Actions executed when buttons in the main menu are clicked.
+
 def play_game():
+    # Stops music, quits Pygame, and launches the game client.
     pygame.mixer.music.stop()
     pygame.quit()
     Utils.debug_log("LAUNCHER", "Launching Client")
@@ -134,6 +174,7 @@ def play_game():
     sys.exit()
 
 def host_game():
+    # Stops music, quits Pygame, and launches the game server.
     pygame.mixer.music.stop()
     pygame.quit()
     Utils.debug_log("LAUNCHER", "Launching Server")
@@ -141,17 +182,27 @@ def host_game():
     sys.exit()
 
 def show_credits():
+    # Placeholder function for displaying credits; not implemented yet.
     Utils.debug_log("UI_CALLBACK", "Credits button clicked - Feature not implemented yet.")
 
 # ---- Create Buttons ----
+# Creates buttons for "Play", "Host", and "Credits" in the main menu.
 MAIN_MENU_BUTTONS = [
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 - BUTTON_HEIGHT - BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Play", play_game),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Host", host_game),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 + BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Credits", show_credits)
 ]
 
+# Function: main_menu
+# The main menu of the game, responsible for rendering the UI and handling button clicks.
+#
+# Parameters:
+#     None
+#
+# Returns:
+#     None
 def main_menu():
-    # Load music
+    # Load and play background music
     music_path = os.path.join("Assets", "Sound", "Prisoner.mp3")
     try:
         pygame.mixer.music.load(music_path)
@@ -186,17 +237,4 @@ def main_menu():
 
         # Splash text
         splash_surface = splash_font.render(SPLASH_TEXT, True, WHITE)
-        splash_rect = splash_surface.get_rect(center=(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 10))
-        SCREEN.blit(splash_surface, splash_rect)
-
-        # Buttons
-        for button in MAIN_MENU_BUTTONS:
-            button.draw(SCREEN)
-
-        # Logo
-        SCREEN.blit(MM_Logo, (100, 100))
-
-        pygame.display.flip()
-
-if __name__ == "__main__":
-    main_menu()
+        splash_rect = splash_surface
