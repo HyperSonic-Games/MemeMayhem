@@ -2,39 +2,34 @@ import PyInstaller.__main__
 import os
 import shutil
 import subprocess
+import argparse
+import sys
 
 ICON_PATH = os.path.join("Assets", "Images", "IconsAndLogos", "MMLogo.ico")
 OUTPUT_DIR = "output"
-DEV_MODE = True  # Toggle this for dev vs prod
-BUILD_DOCS = True
+DEV_MODE = True  # Overwritten by --prod
 
 def WriteConfig():
-    """Safely updates or writes Config.py with the DEV_MODE setting, preserving the header comment."""
     header = "# NOTE: THIS FILE'S DATA IS AUTO GENERATED\n"
     dev_line = f"DEV_MODE = {DEV_MODE}\n"
     lines = []
 
-    # If file exists, try to preserve the header and replace DEV_MODE
     if os.path.exists("Config.py"):
         with open("Config.py", "r") as f:
             for line in f:
                 if line.strip().startswith("DEV_MODE"):
-                    continue  # skip old DEV_MODE line
+                    continue
                 lines.append(line)
 
-    # Ensure the header is at the top
     if not lines or not lines[0].strip().startswith("# NOTE:"):
         lines.insert(0, header)
     elif lines[0].strip() != header.strip():
-        lines[0] = header  # replace outdated header if needed
+        lines[0] = header
 
-    # Append updated DEV_MODE line
     lines.append(dev_line)
 
-    # Write back the file
     with open("Config.py", "w") as f:
         f.writelines(lines)
-
 
 def BuildClient():
     args = [
@@ -54,7 +49,7 @@ def BuildServer():
         '--distpath', OUTPUT_DIR,
         'Server.py'
     ]
-    PyInstaller.__main__.run(args)  # Server is CLI by default
+    PyInstaller.__main__.run(args)
 
 def BuildMain():
     args = [
@@ -68,34 +63,50 @@ def BuildMain():
     PyInstaller.__main__.run(args)
 
 def CopyFiles():
-    """Copies necessary files to the output directory."""
     os.makedirs(OUTPUT_DIR, exist_ok=True)
     shutil.copy("SETTINGS.toml", OUTPUT_DIR)
     shutil.copytree("Assets", os.path.join(OUTPUT_DIR, "Assets"), dirs_exist_ok=True)
 
-# Write config
-WriteConfig()
-
-# Build executables
-BuildMain()
-BuildClient()
-BuildServer()
-
-# Copy files
-CopyFiles()
-
-if BUILD_DOCS:
+def BuildDocs():
     process = subprocess.Popen(
-    ["naturaldocs", "-p", "ND Config"],
-    stdout=subprocess.PIPE,  # Capture standard output
-    stderr=subprocess.PIPE,  # Capture standard error
-    stdin=subprocess.PIPE   # Allow sending input to the process (if needed)
+        ["naturaldocs", "-p", "ND Config"],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        stdin=subprocess.PIPE
     )
-    # Read output and error
     stdout, stderr = process.communicate()
-    
-    # Check if there are any errors
     if stderr:
         print("Error during Natural Docs execution:", stderr.decode())
     else:
         print("Natural Docs completed successfully.")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Build system for Meme Mayhem")
+    parser.add_argument("--docs-only", action="store_true", help="Build documentation only")
+    parser.add_argument("--no-docs", action="store_true", help="Skip documentation generation")
+    parser.add_argument("--prod", action="store_true", help="Enable production mode (disables DEV_MODE)")
+    args = parser.parse_args()
+
+    # No args = show help and exit
+    if len(sys.argv) == 1:
+        parser.print_help()
+        sys.exit(1)
+
+    # Conflicting flags: --docs-only and --no-docs
+    if args.docs_only and args.no_docs:
+        print("Error: --docs-only and --no-docs cannot be used together.")
+        sys.exit(1)
+
+    if args.prod:
+        DEV_MODE = False
+
+    WriteConfig()
+
+    if not args.docs_only:
+        BuildMain()
+        BuildClient()
+        BuildServer()
+        CopyFiles()
+
+    if not args.no_docs:
+        BuildDocs()

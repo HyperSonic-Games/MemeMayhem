@@ -9,7 +9,10 @@
 # Ignored Extensions
 # ------------------------------------------------------------------------
 
-Ignore Extensions: xsd mp3 wav png ico txt bat sh toml
+# If you'd like to prevent certain file extensions from being scanned by
+# Natural Docs, you can do it like this:
+#
+# Ignore Extensions: [extension] [extension] ...
 
 
 # Languages

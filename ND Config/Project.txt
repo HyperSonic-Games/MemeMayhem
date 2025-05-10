@@ -11,6 +11,8 @@ Subtitle: Meme Mayhem docs for modders and devs
 
 Copyright: © 2024 HyperSonic-Games
 
+Style: Dark
+
 
 # This is where you put general information about your project.  None of these
 # settings are required, though Title is recommended.
