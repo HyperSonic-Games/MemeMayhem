@@ -2,6 +2,7 @@ import toml
 import pygame
 import os
 import Config
+import sys
 
 # Import PopupManager for error messages
 import Utils
@@ -33,7 +34,7 @@ class SettingsManager:
             self._handle_error("Config file not found", f"Could not locate: {self.TomlPath}")
             return {}
 
-        return toml.load(self.TomlPath)
+        return toml.load(self.TomlPath) # type: ignore
 
     def _handle_error(self, title: str, message: str):
         """
@@ -41,6 +42,15 @@ class SettingsManager:
         Handles errors based on DEV_MODE setting.
         """
         Utils.error_log(title, message)
+        sys.exit(-1)
+
+    def _get_player_settings(self, key_name: str, default: str):
+        """-
+        INERNAL DO NOT USE
+        Fetch a key from the config and convert it to a pygame key constant or mouse button.
+        Logs errors if an invalid key is used and falls back to default.
+        """
+        key_str = self.config.get("PLAYER", {}).get(key_name, default)
 
     def _get_key_code(self, key_name: str, default: str) -> int:
         """-

@@ -36,7 +36,7 @@ SCREEN_HEIGHT = 600
 # Window title
 # Sets the window title based on whether DEV_MODE is enabled in the config.
 pygame.display.set_caption(
-    "Meme Mayhem (DEV_MODE) - Main Menu" if Config.DEV_MODE else "Meme Mayhem - Main Menu"
+    "Meme Mayhem (DEV_MODE) - PVE" if Config.DEV_MODE else "Meme Mayhem - PVE"
 )
 
 # Try enabling VSync, fallback if unsupported

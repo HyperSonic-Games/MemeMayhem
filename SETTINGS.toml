@@ -1,5 +1,8 @@
 # Meme Mayhem Settings File
 
+[PLAYER]
+Skin = "Blue"
+
 [CONTROLS]
 MoveUp = "w"
 MoveLeft = "a"

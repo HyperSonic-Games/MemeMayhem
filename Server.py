@@ -7,7 +7,7 @@ from NetCode.Networking import UDPServer
 
 # Constant: VERSION
 # The current version of the Meme Mayhem server.
-VERSION = "0.0.1-alpha"
+
 
 # Function: get_public_ip
 # Fetch the public IP address to init the server

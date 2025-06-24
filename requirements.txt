@@ -4,3 +4,5 @@ pygame==2.6.1
 pywin32==309; sys_platform == 'win32'
 pyinstaller==6.12.0
 xmlschema==4.0.1
+numpy==2.3.1
+numba=2.3.1
