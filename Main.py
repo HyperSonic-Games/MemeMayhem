@@ -10,13 +10,13 @@ import os
 
 import Config
 
-# Constant: DISCORD_APP_CLIENT_ID
+
 # The Client ID used for Discord RPC (Rich Presence) integration.
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
-# DEV MODE
+
 # Initializes the settings manager for loading the game's settings from a TOML file.
-SM = SettingsManager.SettingsManager("SETTINGS.toml")
+SM = SettingsManager.SettingsManager("SETTINGS.toml") # type: ignore
 
 # Initialize Pygame
 # Initializes Pygame and logs the successful initialization.
@@ -54,14 +54,14 @@ except Exception as e:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     Utils.error_log("PYGAME_RENDERER", f"VSync failed, fallback to normal: {e}")
 
-# Colors
+#Constants: Colors
 # Defines commonly used colors in RGB format for UI elements.
 GRAY = (50, 50, 50)
 WHITE = (255, 255, 255)
 NAVY_BLUE = (0, 0, 128)
 RED = (255, 0, 0)
 
-# Button settings
+# Constants: Button settings
 # Configures the size and spacing for the buttons in the main menu.
 BUTTON_WIDTH = 200
 BUTTON_HEIGHT = 50
@@ -165,8 +165,16 @@ class Button:
 # ---- Button Actions ----
 # Actions executed when buttons in the main menu are clicked.
 
+def play_PVE():
+    # Stops music, quits Pygame, and launches the PVE engine.
+    pygame.mixer.music.stop()
+    pygame.quit()
+    Utils.debug_log("LAUNCHER", "Launching Client(PVE)")
+    subprocess.run(["PVE"])
+    sys.exit()
+
 def play_game():
-    # Stops music, quits Pygame, and launches the game client.
+    # Stops music, quits Pygame, and launches the game client for PVE mode.
     pygame.mixer.music.stop()
     pygame.quit()
     Utils.debug_log("LAUNCHER", "Launching Client")
@@ -188,6 +196,7 @@ def show_credits():
 # ---- Create Buttons ----
 # Creates buttons for "Play", "Host", and "Credits" in the main menu.
 MAIN_MENU_BUTTONS = [
+    Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 + BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "PVE", play_PVE),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 - BUTTON_HEIGHT - BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Play", play_game),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Host", host_game),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 + BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Credits", show_credits)

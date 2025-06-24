@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:ClientData","ClientData");NDSummary.OnSummaryLoaded("PythonClass:ClientData",[["Python","Python"]],[["Classes","Class"]],[[12,0,0,"ClientData"]]);

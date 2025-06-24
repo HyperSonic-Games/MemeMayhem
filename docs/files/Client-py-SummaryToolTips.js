@@ -1,1 +1,1 @@
-﻿NDSummary.OnToolTipsLoaded("File:Client.py",{2:"<div class=\"NDToolTip TConstant LPython\"><div class=\"TTSummary\">The Client ID used for Discord RPC (Rich Presence) integration.</div></div>"});
+﻿NDSummary.OnToolTipsLoaded("File:Client.py",{12:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype12\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">ClientData</div></div></div><div class=\"TTSummary\">This is the type definiton for player data</div></div>"});

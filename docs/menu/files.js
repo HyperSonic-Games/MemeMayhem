@@ -1,1 +1,1 @@
-﻿NDMenu.OnSectionLoaded("files.js",[[1,"Client.py"],[1,"Main.py"],[1,"Server.py"],[1,"Utils.py"],[1,"WeponManager.py"]]);
+﻿NDMenu.OnSectionLoaded("files.js",[[1,"Client.py"],[1,"Main.py"],[2,"PVE","File:PVE/",[[1,"CommonDat.py"]]],[1,"Server.py"],[1,"Utils.py"],[1,"WeponManager.py"]]);

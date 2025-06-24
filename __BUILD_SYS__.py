@@ -5,6 +5,9 @@ import subprocess
 import argparse
 import sys
 
+
+os.environ["PYTHONPATH"] = "."
+
 ICON_PATH = os.path.join("Assets", "Images", "IconsAndLogos", "MMLogo.ico")
 OUTPUT_DIR = "output"
 DEV_MODE = True  # Overwritten by --prod
@@ -62,8 +65,23 @@ def BuildMain():
         args.insert(1, '--windowed')
     PyInstaller.__main__.run(args)
 
+def BuildPVE():
+    args = [
+        '--onefile',
+        '--icon', ICON_PATH,
+        '--distpath', OUTPUT_DIR,
+        'PVE/PVE.py'
+    ]
+    
+    if not DEV_MODE:
+        args.insert(1, '--windowed')
+    PyInstaller.__main__.run(args)
+
+
 def CopyFiles():
     os.makedirs(OUTPUT_DIR, exist_ok=True)
+    shutil.copy("LICENSE", OUTPUT_DIR)
+    shutil.copy("LICENSE_Pyinstaller", OUTPUT_DIR)
     shutil.copy("SETTINGS.toml", OUTPUT_DIR)
     shutil.copytree("Assets", os.path.join(OUTPUT_DIR, "Assets"), dirs_exist_ok=True)
 
@@ -103,6 +121,7 @@ if __name__ == "__main__":
     WriteConfig()
 
     if not args.docs_only:
+        BuildPVE()
         BuildMain()
         BuildClient()
         BuildServer()

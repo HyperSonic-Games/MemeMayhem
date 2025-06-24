@@ -20,7 +20,7 @@ def get_public_ip():
         return None
 
 
-# Constant: DISCORD_APP_CLIENT_ID
+# DISCORD_APP_CLIENT_ID
 # The Client ID used for Discord RPC (Rich Presence) integration.
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 
@@ -37,9 +37,6 @@ if Utils.IsDiscordAppInstalled():
     except Exception as e:
         Utils.error_log("DISCORD", f"Failed to initialize Discord RPC: {e}")
 
-# Constant: DEV_MODE
-# Flag indicating whether the server is in development mode.
-DEV_MODE = Config.DEV_MODE
 
 # Function: server_msg_parser
 # Parses incoming server messages from clients.
@@ -88,7 +85,7 @@ SERVER_HEADER: str = """
         ████████████            ████████████         ████████████            █████████████
 """
 
-# Color formatting for terminal output
+#Constants: Color formatting for terminal output
 RED = "\033[91m"
 RESET = "\033[0m"
 
