@@ -54,15 +54,20 @@ except Exception as e:
     SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
     Utils.error_log("PYGAME_RENDERER", f"VSync failed, fallback to normal: {e}")
 
-#Constants: Colors
-# Defines commonly used colors in RGB format for UI elements.
+
+# Constant: GRAY
+# rgb value (50, 50, 50)
 GRAY = (50, 50, 50)
+# Constant: WHITE
+# rgb value (255, 255, 255)
 WHITE = (255, 255, 255)
+# Constant: NAVY_BLUE
+# rgb value (0, 0, 128)
 NAVY_BLUE = (0, 0, 128)
+# Constant: RED
+# rgb value (255, 0, 0)
 RED = (255, 0, 0)
 
-# Constants: Button settings
-# Configures the size and spacing for the buttons in the main menu.
 BUTTON_WIDTH = 200
 BUTTON_HEIGHT = 50
 BUTTON_SPACING = 20
@@ -190,14 +195,57 @@ def host_game():
     sys.exit()
 
 def show_credits():
-    # Placeholder function for displaying credits; not implemented yet.
-    Utils.debug_log("UI_CALLBACK", "Credits button clicked - Feature not implemented yet.")
+    Utils.debug_log("UI_CALLBACK", "Credits button clicked - Showing credits screen")
+
+    # Load credits from file
+    credits_path = os.path.join("Assets", "credits.txt")
+    try:
+        with open(credits_path, "r", encoding="utf-8") as f:
+            lines = [line.strip() for line in f if line.strip()]
+    except Exception as e:
+        Utils.error_log("CREDITS", f"Failed to load credits: {e}")
+        lines = ["Credits not found!", "Please check Assets/credits.txt"]
+
+    font = get_scaled_font(25)
+    surfaces = [font.render(line, True, WHITE) for line in lines]
+    line_height = font.get_linesize()
+    total_height = len(surfaces) * (line_height + 10)
+
+    y_offset = SCREEN_HEIGHT
+
+    clock = pygame.time.Clock()
+
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.KEYDOWN and event.key in [pygame.K_ESCAPE, pygame.K_RETURN]:
+                Utils.debug_log("CREDITS", "Exiting credits screen")
+                return  # Exit credits
+
+        SCREEN.fill(GRAY)
+
+        y = y_offset
+        for surf in surfaces:
+            x = (SCREEN_WIDTH - surf.get_width()) // 2
+            SCREEN.blit(surf, (x, y))
+            y += line_height + 10
+
+        y_offset -= 1  # Scroll speed
+
+        if y < 0:
+            y_offset = SCREEN_HEIGHT  # Restart scroll
+
+        pygame.display.flip()
+        clock.tick(60)
 
 # ---- Create Buttons ----
 # Creates buttons for "Play", "Host", and "Credits" in the main menu.
 MAIN_MENU_BUTTONS = [
-    Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 + BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "PVE", play_PVE),
-    Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 - BUTTON_HEIGHT - BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Play", play_game),
+    Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 - BUTTON_HEIGHT * 2 - BUTTON_SPACING * 2, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Play", play_game),
+    Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 - BUTTON_HEIGHT - BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "PVE", play_PVE),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Host", host_game),
     Button(SCREEN_WIDTH // 2 - BUTTON_WIDTH // 2, SCREEN_HEIGHT // 2 + BUTTON_HEIGHT + BUTTON_SPACING, BUTTON_WIDTH, BUTTON_HEIGHT, NAVY_BLUE, "Credits", show_credits)
 ]
@@ -241,9 +289,20 @@ def main_menu():
                     if button.rect.collidepoint(event.pos):
                         button.click()
 
-        # Render UI
         SCREEN.fill(GRAY)
+
+        # Draw logo
+        SCREEN.blit(MM_Logo, ((SCREEN_WIDTH - MM_Logo.get_width()) // 2, 30))
 
         # Splash text
         splash_surface = splash_font.render(SPLASH_TEXT, True, WHITE)
-        splash_rect = splash_surface
+        SCREEN.blit(splash_surface, ((SCREEN_WIDTH - splash_surface.get_width()) // 2, MM_Logo.get_height() + 50))
+
+        # Draw buttons
+        for button in MAIN_MENU_BUTTONS:
+            button.draw(SCREEN)
+
+        pygame.display.flip()
+
+if __name__ == '__main__':
+    main_menu()

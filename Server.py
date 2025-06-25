@@ -5,8 +5,7 @@ import os
 import requests
 from NetCode.Networking import UDPServer
 
-# Constant: VERSION
-# The current version of the Meme Mayhem server.
+
 
 
 # Function: get_public_ip

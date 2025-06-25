@@ -29,6 +29,10 @@ def WriteConfig():
     elif lines[0].strip() != header.strip():
         lines[0] = header
 
+    # Remove any trailing blank lines before appending
+    while lines and lines[-1].strip() == "":
+        lines.pop()
+
     lines.append(dev_line)
 
     with open("Config.py", "w") as f:

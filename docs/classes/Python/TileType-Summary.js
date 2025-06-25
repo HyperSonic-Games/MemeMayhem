@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:TileType","TileType");NDSummary.OnSummaryLoaded("PythonClass:TileType",[["Python","Python"]],[["Classes","Class"]],[[15,0,0,"TileType"]]);

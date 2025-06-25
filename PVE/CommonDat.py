@@ -1,3 +1,0 @@
-"""
-about: Common data structures
-"""

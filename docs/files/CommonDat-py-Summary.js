@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("File:CommonDat.py","CommonDat.py");NDSummary.OnSummaryLoaded("File:CommonDat.py",[["Python","Python"]],[["Classes","Class"],["Groups","Group"],["Information","Information"]],[[11,0,1,"Information","Information"],[13,0,2,"Common data structures","Common_data_structures"],[15,0,0,"TileType","TileType"]]);

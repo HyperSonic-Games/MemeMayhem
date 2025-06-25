@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("File:Config.py",{2:"<div class=\"NDToolTip TConstant LPython\"><div class=\"TTSummary\">The current version of the Meme Mayhem</div></div>"});

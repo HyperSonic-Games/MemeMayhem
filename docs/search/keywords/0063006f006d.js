@@ -1,1 +1,1 @@
-﻿NDSearch.OnPrefixDataLoaded("com",["Information"],[["Common",,[[,"Common data structures",,,0,"File:PVE/CommonDat.py:Common_data_structures"]]]]);
+﻿NDSearch.OnPrefixDataLoaded("com",["Information"],[["Common",,[[,"Common data structures",,,0,"File:CommonDat.py:Common_data_structures"]]]]);

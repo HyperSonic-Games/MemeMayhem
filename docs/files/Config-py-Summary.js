@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("File:Config.py","Config.py");NDSummary.OnSummaryLoaded("File:Config.py",[["Python","Python"]],[["Constants","Constant"],["Groups","Group"]],[[1,0,1,"Constants","Constants"],[2,0,0,"VERSION","VERSION"]]);

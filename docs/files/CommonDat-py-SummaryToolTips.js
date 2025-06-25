@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("File:CommonDat.py",{15:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype15\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">TileType</div></div></div></div>"});
