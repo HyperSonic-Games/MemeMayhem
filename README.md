@@ -30,8 +30,7 @@ Your public IP is what other players will use to connect:
 Building From Source
 --------------------
 
-To build the server and client from source:
-    
+To build Meme Mayhem from source:
 
 ### On Windows
 
@@ -41,4 +40,4 @@ To build the server and client from source:
 
     ./Build.sh --prod
 
-_Use `--docs-only` to build only documentation, or `--no-docs` to skip docs._
+_Use `--docs-only` to build only documentation (Needs Natual Docs installed), or `--no-docs` to skip docs._
