@@ -31,11 +31,6 @@ Building From Source
 --------------------
 
 To build the server and client from source:
-
-1.  Open the file `__BUILD_SYS__.py`.
-2.  Set the build mode:
-    
-        DEV_MODE = True  # Set to False for production
     
 
 ### On Windows

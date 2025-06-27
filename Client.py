@@ -12,7 +12,7 @@ DISCORD_APP_CLIENT_ID = "13409554293425408734"
 
 pm = Utils.PopupManager()
 
-Client = UDPClient.UDPClient(pm.TextInput("Server IP", "Enter the IP of the server you would like to contect to"), 54777) # type: ignore
+Client = UDPClient.UDPClient(pm.TextInput("Server IP", "Enter the IP of the server you would like to conect to"), 54777) # type: ignore
 
 
 # Class: ClientData

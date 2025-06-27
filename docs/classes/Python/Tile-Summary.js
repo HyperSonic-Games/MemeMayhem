@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:Tile","Tile");NDSummary.OnSummaryLoaded("PythonClass:Tile",[["Python","Python"]],[["Classes","Class"],["Functions","Function"],["Groups","Group"]],[[57,0,0,"Tile"],[58,0,2,"Functions","Functions"],[52,0,1,"get_type","get_type"],[60,0,1,"get_type","get_type(2)"]]);

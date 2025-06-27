@@ -6,8 +6,6 @@ import argparse
 import sys
 
 
-os.environ["PYTHONPATH"] = "."
-
 ICON_PATH = os.path.join("Assets", "Images", "IconsAndLogos", "MMLogo.ico")
 OUTPUT_DIR = "output"
 DEV_MODE = True  # Overwritten by --prod
@@ -74,7 +72,7 @@ def BuildPVE():
         '--onefile',
         '--icon', ICON_PATH,
         '--distpath', OUTPUT_DIR,
-        'PVE/PVE.py'
+        'PVE.py'
     ]
     
     if not DEV_MODE:

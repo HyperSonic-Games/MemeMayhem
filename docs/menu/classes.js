@@ -1,1 +1,1 @@
-﻿NDMenu.OnSectionLoaded("classes.js",[[1,"ClientData"],[1,"PopupManager"],[1,"TileType"],[1,"Wepon"],[1,"WeponType"]]);
+﻿NDMenu.OnSectionLoaded("classes.js",[[1,"ClientData"],[1,"PopupManager"],[1,"Tile"],[1,"TileType"],[1,"Wepon"],[1,"WeponType"]]);

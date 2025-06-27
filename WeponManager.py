@@ -24,7 +24,7 @@ class WeponType(enum.Enum):
 # headshot ability, and more. It can be extended or manipulated by modders.
 #
 # Usage:
-#     Create a new weapon instance, set its properties, or load them from a .toml file.
+#     Create a new weapon instance, and sets its properties
 #
 # Example:
 #     weapon = Wepon()
