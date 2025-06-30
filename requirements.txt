@@ -6,3 +6,4 @@ pyinstaller==6.12.0
 xmlschema==4.0.1
 numpy==2.3.1
 numba=2.3.1
+cbor2=5.6.5

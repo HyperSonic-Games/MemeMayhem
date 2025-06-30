@@ -1,6 +1,6 @@
 output/
 build/
 __pycache__
-__pycache__/
+*/__pycache__/
 *.pyc
 ND Config/Working Data

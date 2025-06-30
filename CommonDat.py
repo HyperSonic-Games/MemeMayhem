@@ -8,44 +8,6 @@ about: Common data structures
 """
 
 """
-Class: TileType
-The Type of tile on the map
-"""
-class TileType(enum.Enum):
-    GROUND = 0
-    WALL = 1
-    DAMG = 2
-    SPWN = 3
-    ENEMY_SPWN = 4
-    HEALTH = 5
-
-"""
-Class: Tile
-Stores all of the data required to query and render a tile on the map
-"""
-class Tile:
-
-    def __init__(self, type: TileType, texture: pygame.surface.Surface):
-        self.type = type
-        self.texture = texture
-    
-    """
-    Method: get_type
-    Used to query the tile about what type it is
-    """
-    def get_type(self) -> TileType:
-        return self.type
-    
-    """
-    Method: get_type
-    Used to query the tile about what type it is
-    Returns:
-        texture - a pygame surface used to draw the tile
-    """
-    def get_texture(self):
-        return self.texture
-    
-"""
 Class: Entity
 The Base class for <Player> and <Enemy>
 provides things like location and hp
