@@ -1,1 +1,1 @@
-﻿NDSearch.OnPrefixDataLoaded("com",["Information"],[["Common",,[[,"Common data structures",,,0,"File:CommonDat.py:Common_data_structures"]]]]);
+﻿NDSearch.OnPrefixDataLoaded("com",["Information","Function"],[["Common",,[[,"Common data structures",,,0,"File:CommonDat.py:Common_data_structures"]]],["compile_map",,[["Tile",,,,1,"File:MapSys.py:Tile.compile_map","PythonClass:Tile:compile_map"]]]]);

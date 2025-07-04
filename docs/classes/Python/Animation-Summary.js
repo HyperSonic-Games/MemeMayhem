@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:Animation","Animation");NDSummary.OnSummaryLoaded("PythonClass:Animation",[["Python","Python"]],[["Classes","Class"],["Functions","Function"],["Groups","Group"]],[[57,0,0,"Animation"],[58,0,2,"Functions","Functions"],[59,0,1,"__init__","__init__"]]);

@@ -1,0 +1,1 @@
+﻿NDSummary.OnToolTipsLoaded("PythonClass:Entity",{15:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype15\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">Entity</div></div></div><div class=\"TTSummary\">The Base class for &lt;Player&gt; and &lt;Enemy&gt; provides things like location and hp</div></div>"});

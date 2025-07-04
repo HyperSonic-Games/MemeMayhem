@@ -1,1 +1,0 @@
-﻿NDSummary.OnToolTipsLoaded("PythonClass:TileType",{55:"<div class=\"NDToolTip TClass LPython\"><div class=\"NDClassPrototype\" id=\"NDClassPrototype55\"><div class=\"CPEntry TClass Current\"><div class=\"CPName\">TileType</div></div></div><div class=\"TTSummary\">The Type of tile on the map</div></div>"});

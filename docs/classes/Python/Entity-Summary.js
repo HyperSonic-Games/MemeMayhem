@@ -1,0 +1,1 @@
+﻿NDFramePage.OnPageTitleLoaded("PythonClass:Entity","Entity");NDSummary.OnSummaryLoaded("PythonClass:Entity",[["Python","Python"]],[["Classes","Class"]],[[15,0,0,"Entity"]]);

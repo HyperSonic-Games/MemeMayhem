@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("par",["Function"],[["parse_map",,[["Tile",,,,0,"File:MapSys.py:Tile.parse_map","PythonClass:Tile:parse_map"]]],["parse_tile",,[["Tile",,,,0,"File:MapSys.py:Tile.parse_tile","PythonClass:Tile:parse_tile"]]]]);

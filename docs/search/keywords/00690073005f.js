@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("is_",["Function"],[["is_colliding",,[["Tile",,,,0,"File:MapSys.py:Tile.is_colliding","PythonClass:Tile:is_colliding"]]]]);

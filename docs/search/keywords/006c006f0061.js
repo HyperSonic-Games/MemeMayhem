@@ -1,1 +1,1 @@
-﻿NDSearch.OnPrefixDataLoaded("loa",["Function"],[["load_logo",,[[,,,,0,"File:Main.py:load_logo"]]],["load_splash_text",,[[,,,,0,"File:Main.py:load_splash_text"]]]]);
+﻿NDSearch.OnPrefixDataLoaded("loa",["Function"],[["load_logo",,[[,,,,0,"File:Main.py:load_logo"]]],["load_splash_text",,[[,,,,0,"File:Main.py:load_splash_text"]]],["load_texture",,[["Tile",,,,0,"File:MapSys.py:Tile.load_texture","PythonClass:Tile:load_texture"]]]]);

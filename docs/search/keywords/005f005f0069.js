@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("__i",["Function"],[["__init__",,[["Animation",,,,0,"File:MapSys.py:Animation.__init__","PythonClass:Animation:__init__"],["Tile",,,,0,"File:MapSys.py:Tile.__init__","PythonClass:Tile:__init__"]]]]);

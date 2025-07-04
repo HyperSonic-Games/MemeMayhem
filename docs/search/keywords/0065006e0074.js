@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("ent",["Class"],[["Entity",,[[,,,,0,"File:CommonDat.py:Entity","PythonClass:Entity"]]]]);

@@ -1,0 +1,1 @@
+﻿NDSearch.OnPrefixDataLoaded("ani",["Class"],[["Animation",,[[,,,,0,"File:MapSys.py:Animation","PythonClass:Animation"]]]]);
