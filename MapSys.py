@@ -122,3 +122,14 @@ def compile_map(json_path: str, cbor_path: Union[str, None] = None):
 
     with open(cbor_path, "wb") as f:
         cbor2.dump(raw, f)
+
+# anoying math to get the tile we are on
+def get_tile_at(player_x: int, player_y: int, tiles: list[Tile], map_width: int, tile_width: int = 16, tile_height: int = 16) -> Tile:
+    tile_x = player_x // tile_width
+    tile_y = player_y // tile_height
+    index = tile_y * map_width + tile_x
+
+    if index < 0 or index >= len(tiles):
+        raise IndexError("Player is outside the map bounds")
+
+    return tiles[index]
