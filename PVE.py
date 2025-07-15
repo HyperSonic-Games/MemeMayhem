@@ -4,13 +4,15 @@ import Utils
 from pypresence import Presence
 import Config
 import CommonDat
+import MapSys 
 
 DISCORD_APP_CLIENT_ID = "1349055429304520734"
 TILE_SIZE = 16
-MAP_WIDTH = 320
-MAP_HEIGHT = 180
-VIRTUAL_WIDTH = MAP_WIDTH * TILE_SIZE  # 5120
-VIRTUAL_HEIGHT = MAP_HEIGHT * TILE_SIZE  # 2880
+MAP_WIDTH = 10
+MAP_HEIGHT = 10
+VIRTUAL_WIDTH = MAP_WIDTH * TILE_SIZE  # 512
+VIRTUAL_HEIGHT = MAP_HEIGHT * TILE_SIZE  # 288
+
 
 pm = Utils.PopupManager()
 
@@ -63,10 +65,20 @@ def screen_to_virtual(mouse_x, mouse_y):
     virtual_y = (mouse_y - y_offset) // scale
     return int(virtual_x), int(virtual_y)
 
+try:
+    tiles = MapSys.parse_map("Assets/Maps/test.mmmap")
+    print(f"Loaded {len(tiles)} tiles")
+except Exception as e:
+    Utils.error_log("MAP_LOAD", f"Failed to load map: {e}")
+    tiles = []
 
+map_width = MAP_WIDTH
+map_height = MAP_HEIGHT
+frame_count = 0
 
 # Main game loop
 while True:
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT or (
             event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
@@ -76,22 +88,33 @@ while True:
 
         if event.type == pygame.MOUSEBUTTONDOWN:
             mx, my = screen_to_virtual(*event.pos)
+            # You can add mouse interaction logic here if needed
 
     # Clear virtual surface
     virtual_surface.fill((0, 0, 0))
 
-    # Draw grid
-    for y in range(MAP_HEIGHT):
-        for x in range(MAP_WIDTH):
-            rect = pygame.Rect(x * TILE_SIZE, y * TILE_SIZE, TILE_SIZE, TILE_SIZE)
-            pygame.draw.rect(virtual_surface, (40, 40, 40), rect, 1)
+    # Render the map tiles using MapSys.render_map
 
+    MapSys.render_map(
+        screen=virtual_surface,
+        tiles=tiles,
+        map_width=map_width,
+        map_height=map_height,
+        camera_x=0,
+        camera_y=0,
+        tile_size=TILE_SIZE,
+        frame_count=frame_count
+    )
 
     # Scale and blit to screen
     scaled_surface = pygame.transform.scale(
         virtual_surface, (VIRTUAL_WIDTH * scale, VIRTUAL_HEIGHT * scale)
     )
     SCREEN.fill((0, 0, 0))
+    virtual_surface.fill((0, 0, 0))
+    pygame.draw.rect(virtual_surface, (255, 0, 0), (0, 0, TILE_SIZE, TILE_SIZE))
     SCREEN.blit(scaled_surface, (x_offset, y_offset))
     pygame.display.flip()
     clock.tick(60)
+
+    frame_count += 1

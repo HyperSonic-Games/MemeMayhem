@@ -2,6 +2,7 @@ import json
 import enum
 import pygame
 import cbor2
+import os
 from typing import Union, Optional
 
 """
@@ -15,6 +16,35 @@ class TileType(enum.Enum):
     SPWN = 3         # Player spawn point
     ENEMY_SPWN = 4   # Enemy spawn point
     HEALTH = 5       # Health pickup
+
+
+_texture_cache = {}
+
+"""
+Function: load_texture
+Loads a texture by name
+
+Parameters:
+    name - The name of the texture to load.
+
+Returns:
+    A pygame.Surface
+"""
+def load_texture(name: str) -> pygame.surface.Surface:
+    if name in _texture_cache:
+        return _texture_cache[name]
+
+    path = os.path.join("Assets", "Images", "Maps", f"{name}.png")
+    try:
+        surface = pygame.image.load(path).convert_alpha()
+    except pygame.error as e:
+        print(f"Warning: failed to load texture '{path}': {e}")
+        # fallback: magenta placeholder
+        surface = pygame.Surface((16, 16), pygame.SRCALPHA)
+        surface.fill((255, 0, 255))
+
+    _texture_cache[name] = surface
+    return surface
 
 
 """
@@ -37,6 +67,24 @@ class Animation:
         self.rate = rate
         self.offset = offset
         self.loop = loop
+
+    """
+    Function: get_current_frame
+    Gets the current frame name based on the frame count.
+
+    Parameters:
+        frame_count - Current global frame count (int)
+
+    Returns:
+        Frame image name (str)
+    """
+    def get_current_frame(self, frame_count: int) -> str:
+        frame_index = ((frame_count + self.offset) // self.rate)
+        if self.loop:
+            frame_index %= len(self.frames)
+        else:
+            frame_index = min(frame_index, len(self.frames) - 1)
+        return self.frames[frame_index]
 
 
 """
@@ -78,8 +126,11 @@ class Tile:
         return self.type
 
     """
-    Function: get_texture
-    Gets the tile's texture.
+    Function: get_current_texture
+    Gets the tile's current texture, supporting animation frames.
+
+    Parameters:
+        frame_count - Current global frame count (int)
 
     Returns:
         A pygame.Surface.
@@ -87,29 +138,13 @@ class Tile:
     Raises:
         ValueError if the tile has no texture or animation.
     """
-    def get_texture(self) -> pygame.surface.Surface:
+    def get_current_texture(self, frame_count: int = 0) -> pygame.surface.Surface:
+        if self.animation:
+            frame_name = self.animation.get_current_frame(frame_count)
+            return load_texture(frame_name)
         if self.texture:
             return self.texture
-        elif self.animation:
-            return load_texture(self.animation.frames[0])
-        else:
-            raise ValueError("Tile has no texture or animation")
-
-
-"""
-Function: load_texture
-Loads a texture by name. (NOT IMPL YET)
-
-Parameters:
-    name - The name of the texture to load.
-
-Returns:
-    A pygame.Surface placeholder (pink).
-"""
-def load_texture(name: str) -> pygame.surface.Surface:
-    surface = pygame.Surface((16, 16))
-    surface.fill((255, 0, 255))
-    return surface
+        raise ValueError("Tile has no texture or animation")
 
 
 """
@@ -273,3 +308,48 @@ def is_colliding(player_x: int, player_y: int, player_w: int, player_h: int,
             return True
 
     return False
+
+
+"""
+Function: render_map
+Renders the entire map to the screen.
+
+Parameters:
+    screen - The pygame Surface to render on (usually the window).
+    tiles - List of Tile objects.
+    map_width - Width of the map in tiles.
+    map_height - Height of the map in tiles.
+    camera_x - Top-left x position of the camera in pixels.
+    camera_y - Top-left y position of the camera in pixels.
+    tile_size - Size of each square tile (width = height).
+    frame_count - (Optional) Current animation frame count.
+"""
+def render_map(screen: pygame.Surface,
+               tiles: list[Tile],
+               map_width: int,
+               map_height: int,
+               camera_x: int,
+               camera_y: int,
+               tile_size: int = 16,
+               frame_count: int = 0):
+
+    total_tiles = len(tiles)
+
+    for y in range(map_height):
+        for x in range(map_width):
+            index = y * map_width + x
+            # Prevent out-of-range access
+            if index >= total_tiles:
+                continue
+
+            tile = tiles[index]
+            screen_x = x * tile_size - camera_x
+            screen_y = y * tile_size - camera_y
+
+            # Skip if off-screen (optional optimization)
+            if (screen_x + tile_size < 0 or screen_y + tile_size < 0 or
+                screen_x >= screen.get_width() or screen_y >= screen.get_height()):
+                continue
+
+            texture = tile.get_current_texture(frame_count)
+            screen.blit(texture, (screen_x, screen_y))

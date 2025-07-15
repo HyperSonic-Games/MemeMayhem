@@ -1,0 +1,16 @@
+{
+  "width": 10,
+  "height": 10,
+  "tiles": [
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"},
+    {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}, {"t": 0, "tex": "grass"}
+  ]
+}
