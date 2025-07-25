@@ -353,3 +353,16 @@ def render_map(screen: pygame.Surface,
 
             texture = tile.get_current_texture(frame_count)
             screen.blit(texture, (screen_x, screen_y))
+
+
+def get_map_size(path: str) -> tuple[int, int]:
+    if path.endswith(".mmmap"):
+        with open(path, "r") as f:
+            raw = json.load(f)
+    elif path.endswith(".mmcmap"):
+        with open(path, "rb") as f:
+            raw = cbor2.load(f)
+    else:
+        raise ValueError("Unsupported file extension")
+
+    return raw["width"], raw["height"]

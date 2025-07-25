@@ -58,7 +58,7 @@
   <li>1 - WALL: solid, unwalkable</li>
   <li>2 - DAMG: damaging tile (e.g. lava)</li>
   <li>3 - SPWN: player spawn point</li>
-  <li>4 - ENEMY_SPWN: enemy spawn location</li>
+  <li>4 - ENEMY_SPWN: enemy spawn location (only used for PVE)</li>
   <li>5 - HEALTH: health pickup tile</li>
 </ul>
 
@@ -73,7 +73,7 @@
 <h2>Notes</h2>
 <ul>
   <li>Either <code>tex</code> or <code>anim</code> is required, not both</li>
-  <li><code>hp</code> is optional and indicates tile health</li>
+  <li><code>hp</code> is optional and indicates tile health (used internaly for stuff like health packs)</li>
   <li><code>p</code> is an optional object for custom properties</li>
   <li>Format is compatible with both JSON and CBOR encoding</li>
   <li>Meme Mayhem automatically compiles JSON (<code>.mmmap</code>) map files to CBOR (<code>.mmcmap</code>) for faster loading, using JSON as a fallback.</li>

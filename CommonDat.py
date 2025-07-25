@@ -1,6 +1,6 @@
 import enum
 import pygame
-
+import MapSys
 
 
 """
@@ -53,3 +53,17 @@ class Entity:
 class Player(Entity):
     def __init__(self, startX, startY, startAngle, startHp, texture: pygame.surface.Surface):
         super().__init__(startX, startY, startAngle, startHp, texture)
+    
+    def move(self, dx, dy, tiles, map_width, tile_size):
+        new_x = self.x + dx
+        new_y = self.y + dy
+        
+        if not MapSys.is_colliding(new_x, new_y, 16, 16, tiles, map_width, tile_size):
+            self.x = new_x
+            self.y = new_y
+
+    def draw(self, surface, camera_x, camera_y):
+        draw_x = self.x - camera_x
+        draw_y = self.y - camera_y
+        surface.blit(self.texture, (draw_x, draw_y))
+
