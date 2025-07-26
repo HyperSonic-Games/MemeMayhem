@@ -7,25 +7,8 @@ from pypresence import Presence
 import Utils
 import SettingsManager
 import os
-import MapSys
 
 import Config
-
-# Check for command-line map compilation
-if len(sys.argv) >= 3 and sys.argv[1] == "--compile-map":
-    map_name = sys.argv[2]
-    print("MAP_COMPILER: ", f"Compiling map: {map_name}")
-    try:
-        MapSys.compile_map(
-        os.path.join("Assets", "Maps", map_name + ".mmmap"),
-        os.path.join("Assets", "Maps", "__COMPILED__", map_name + ".mmcmap")
-        )
-
-        print("MAP_COMPILER: ", f"Map '{map_name}' compiled successfully.")
-        sys.exit(0)
-    except Exception as e:
-        Utils.error_log("MAP_COMPILER", f"Failed to compile map '{map_name}': {e}")
-        sys.exit(1)
 
 
 # The Client ID used for Discord RPC (Rich Presence) integration.

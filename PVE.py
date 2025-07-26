@@ -1,158 +1,170 @@
 import pygame
-import sys
-import Utils
-from pypresence import Presence
-import Config
-import CommonDat
-import MapSys
+import math
+from MAPS import DEV_GRASS_PLAIN, TILE_SIZE, point_tile_collides, TileType
 
-DISCORD_APP_CLIENT_ID = "1349055429304520734"
-TILE_SIZE = 16
-MAP_WIDTH = 0
-MAP_HEIGHT = 0
-VIRTUAL_WIDTH = 320
-VIRTUAL_HEIGHT = 240
-
-pm = Utils.PopupManager()
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+zoom = 3.0  # zoom level (tweak to fit)
 
 pygame.init()
-Utils.debug_log("PYGAME_INIT", "Pygame initialized")
-
-if Utils.IsDiscordAppInstalled():
-    try:
-        RPC = Presence(DISCORD_APP_CLIENT_ID)
-        RPC.connect()
-        RPC.update(state="Playing Meme Mayhem: \nPVE")
-        Utils.debug_log("DISCORD", "Discord RPC Connected and Presence Set")
-    except Exception as e:
-        Utils.error_log("DISCORD", f"Failed to initialize Discord RPC: {e}")
-
-info = pygame.display.Info()
-screen_width = info.current_w
-screen_height = info.current_h
-
-pygame.display.set_caption(
-    "Meme Mayhem (DEV_MODE) - PVE" if Config.DEV_MODE else "Meme Mayhem - PVE"
-)
-
-try:
-    SCREEN = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN, vsync=1)
-    Utils.debug_log("PYGAME_RENDERER", "VSync Fullscreen Renderer Created")
-except Exception as e:
-    SCREEN = pygame.display.set_mode((screen_width, screen_height), pygame.FULLSCREEN)
-    Utils.error_log("PYGAME_RENDERER", f"VSync failed, fallback to fullscreen: {e}")
-
-virtual_surface = pygame.Surface((VIRTUAL_WIDTH, VIRTUAL_HEIGHT))
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Meme Mayhem - Raycast Shadows Demo")
 clock = pygame.time.Clock()
 
-scale_x = screen_width // VIRTUAL_WIDTH
-scale_y = screen_height // VIRTUAL_HEIGHT
-scale = max(1, min(scale_x, scale_y))
-x_offset = (screen_width - VIRTUAL_WIDTH * scale) // 2
-y_offset = (screen_height - VIRTUAL_HEIGHT * scale) // 2
+entity = {
+    'x': 15 * TILE_SIZE + TILE_SIZE // 2,
+    'y': 15 * TILE_SIZE + TILE_SIZE // 2,
+    'radius': 14,
+    'rotation': 0,
+    'speed': 180,
+}
 
-def screen_to_virtual(mouse_x, mouse_y):
-    virtual_x = (mouse_x - x_offset) // scale
-    virtual_y = (mouse_y - y_offset) // scale
-    return int(virtual_x), int(virtual_y)
+def clamp(val, min_val, max_val):
+    return max(min_val, min(val, max_val))
 
-# Load map
-try:
-    tiles = MapSys.parse_map("Assets/Maps/test.mmmap")
-    Utils.debug_log("MAP_LOAD", f"Loaded {len(tiles)} tiles")
-    MAP_WIDTH, MAP_HEIGHT = MapSys.get_map_size("Assets/Maps/test.mmmap")
+def resolve_collision(entity, tilemap, tile_size):
+    px, py = entity['x'], entity['y']
+    r = entity['radius']
 
-    # Find player spawn point
-    for i, tile in enumerate(tiles):
-        if tile.get_type() == MapSys.TileType.SPWN:
-            spawn_x = (i % MAP_WIDTH) * TILE_SIZE
-            spawn_y = (i // MAP_WIDTH) * TILE_SIZE
-            break
-    else:
-        spawn_x = spawn_y = 0  # fallback
+    left_tile = int((px - r) // tile_size)
+    right_tile = int((px + r) // tile_size)
+    top_tile = int((py - r) // tile_size)
+    bottom_tile = int((py + r) // tile_size)
 
-    player_texture = pygame.Surface((16, 16), pygame.SRCALPHA)
-    player_texture.fill((255, 255, 0))  # Yellow box
-    player = CommonDat.Player(spawn_x, spawn_y, 0, 100, player_texture)
+    for ty in range(top_tile, bottom_tile + 1):
+        for tx in range(left_tile, right_tile + 1):
+            if 0 <= ty < len(tilemap) and 0 <= tx < len(tilemap[0]):
+                if tilemap[ty][tx].collidable:
+                    tile_rect = pygame.Rect(tx * tile_size, ty * tile_size, tile_size, tile_size)
+                    closest_x = clamp(px, tile_rect.left, tile_rect.right)
+                    closest_y = clamp(py, tile_rect.top, tile_rect.bottom)
 
-except Exception as e:
-    Utils.error_log("MAP_LOAD", f"Failed to load map: {e}")
-    tiles = []
-    player_texture = pygame.Surface((16, 16))
-    player_texture.fill((255, 0, 255))
-    player = CommonDat.Player(0, 0, 0, 100, player_texture)
+                    dist_x = px - closest_x
+                    dist_y = py - closest_y
+                    dist_sq = dist_x * dist_x + dist_y * dist_y
 
-frame_count = 0
+                    if dist_sq < r * r:
+                        dist = math.sqrt(dist_sq)
+                        if dist == 0:
+                            # Push out in arbitrary direction
+                            if py > tile_rect.centery:
+                                dist_y = 1
+                                dist_x = 0
+                            else:
+                                dist_y = -1
+                                dist_x = 0
+                            dist = 1
+                        push_dist = r - dist
+                        nx = dist_x / dist
+                        ny = dist_y / dist
+                        entity['x'] += nx * push_dist
+                        entity['y'] += ny * push_dist
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT or (
-            event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE
-        ):
-            try:
-                RPC.clear() # pyright: ignore[reportPossiblyUnboundVariable]
-                RPC.close() # pyright: ignore[reportPossiblyUnboundVariable]
-            except:
-                pass
-            pygame.quit()
-            sys.exit()
+def cast_rays(entity, tilemap, tile_size, num_rays=360, max_dist=600):
+    px, py = entity['x'], entity['y']
+    points = []
 
-    # Player movement input
-    keys = pygame.key.get_pressed()
-    if keys[pygame.K_w] or keys[pygame.K_UP]:
-        player.move(0, -2, tiles, MAP_WIDTH, TILE_SIZE)
-    if keys[pygame.K_s] or keys[pygame.K_DOWN]:
-        player.move(0, 2, tiles, MAP_WIDTH, TILE_SIZE)
-    if keys[pygame.K_a] or keys[pygame.K_LEFT]:
-        player.move(-2, 0, tiles, MAP_WIDTH, TILE_SIZE)
-    if keys[pygame.K_d] or keys[pygame.K_RIGHT]:
-        player.move(2, 0, tiles, MAP_WIDTH, TILE_SIZE)
+    for i in range(num_rays):
+        angle = math.radians(i)
+        dx = math.cos(angle)
+        dy = math.sin(angle)
 
-    # Camera follow player like most top-down games
-    map_pixel_width = MAP_WIDTH * TILE_SIZE
-    map_pixel_height = MAP_HEIGHT * TILE_SIZE
+        for dist in range(0, max_dist, 4):
+            test_x = px + dx * dist
+            test_y = py + dy * dist
+            if point_tile_collides(tilemap, tile_size, test_x, test_y):
+                points.append((test_x, test_y))
+                break
+        else:
+            points.append((px + dx * max_dist, py + dy * max_dist))
+    return points
 
-    if map_pixel_width <= VIRTUAL_WIDTH:
-        camera_x = -(VIRTUAL_WIDTH - map_pixel_width) // 2
-    else:
-        target_x = int(player.get_x() + player_texture.get_width() // 2 - VIRTUAL_WIDTH // 2)
-        camera_x = max(0, min(target_x, map_pixel_width - VIRTUAL_WIDTH))
+def world_to_screen(wx, wy, cam_x, cam_y):
+    sx = (wx - cam_x) * zoom + SCREEN_WIDTH // 2
+    sy = (wy - cam_y) * zoom + SCREEN_HEIGHT // 2
+    return int(sx), int(sy)
 
-    if map_pixel_height <= VIRTUAL_HEIGHT:
-        camera_y = -(VIRTUAL_HEIGHT - map_pixel_height) // 2
-    else:
-        target_y = int(player.get_y() + player_texture.get_height() // 2 - VIRTUAL_HEIGHT // 2)
-        camera_y = max(0, min(target_y, map_pixel_height - VIRTUAL_HEIGHT))
+def draw_tilemap(surface, tilemap, tile_size, cam_x, cam_y):
+    tiles_x = int(SCREEN_WIDTH / (tile_size * zoom)) + 2
+    tiles_y = int(SCREEN_HEIGHT / (tile_size * zoom)) + 2
+    start_x = int(cam_x // tile_size) - tiles_x // 2
+    start_y = int(cam_y // tile_size) - tiles_y // 2
 
-    # Draw map
-    virtual_surface.fill((0, 0, 0))
-    MapSys.render_map(
-        screen=virtual_surface,
-        tiles=tiles,
-        map_width=MAP_WIDTH,
-        map_height=MAP_HEIGHT,
-        camera_x=camera_x,
-        camera_y=camera_y,
-        tile_size=TILE_SIZE,
-        frame_count=frame_count
-    )
+    for y in range(start_y, start_y + tiles_y):
+        for x in range(start_x, start_x + tiles_x):
+            if 0 <= y < len(tilemap) and 0 <= x < len(tilemap[0]):
+                tile = tilemap[y][x]
+                color = (80, 180, 80) if tile.tile_type == TileType.GROUND else (60, 60, 60)
+                rect = pygame.Rect(0, 0, tile_size * zoom, tile_size * zoom)
+                screen_x, screen_y = world_to_screen(x * tile_size, y * tile_size, cam_x, cam_y)
+                rect.topleft = (screen_x, screen_y)
+                pygame.draw.rect(surface, color, rect)
+                if tile.collidable:
+                    pygame.draw.rect(surface, (255, 0, 0), rect, 1)
 
-    # Draw player
-    player.draw(virtual_surface, camera_x, camera_y)
+def draw_player(surface, entity, cam_x, cam_y):
+    px, py = world_to_screen(entity['x'], entity['y'], cam_x, cam_y)
+    r = int(entity['radius'] * zoom)
+    pygame.draw.circle(surface, (0, 255, 0), (px, py), r, 3)
 
-    # Optional: FPS counter
-    if Config.DEV_MODE:
-        fps = clock.get_fps()
-        font = pygame.font.SysFont(None, 20)
-        fps_text = font.render(f"{fps:.1f} FPS", False, (0, 255, 0))
-        virtual_surface.blit(fps_text, (2, 2))
+    angle_rad = math.radians(entity['rotation'] - 90)
+    tip_x = entity['x'] + math.cos(angle_rad) * (entity['radius'] + 16)
+    tip_y = entity['y'] + math.sin(angle_rad) * (entity['radius'] + 16)
+    tip_sx, tip_sy = world_to_screen(tip_x, tip_y, cam_x, cam_y)
+    pygame.draw.line(surface, (255, 0, 0), (px, py), (tip_sx, tip_sy), 2)
+    pygame.draw.circle(surface, (255, 0, 0), (tip_sx, tip_sy), max(3, int(4 * zoom)))
 
-    # Scale & blit to screen
-    scaled_surface = pygame.transform.scale(
-        virtual_surface, (VIRTUAL_WIDTH * scale, VIRTUAL_HEIGHT * scale)
-    )
-    SCREEN.fill((0, 0, 0))
-    SCREEN.blit(scaled_surface, (x_offset, y_offset))
-    pygame.display.flip()
-    clock.tick(60)
-    frame_count += 1
+def draw_shadows(surface, entity, tilemap, tile_size, cam_x, cam_y):
+    points = cast_rays(entity, tilemap, tile_size)
+    screen_points = [world_to_screen(x, y, cam_x, cam_y) for x, y in points]
+
+    shadow_surface = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.SRCALPHA)
+    shadow_surface.fill((0, 0, 0, 200))  # fill whole screen with semi-transparent black
+    pygame.draw.polygon(shadow_surface, (0, 0, 0, 0), screen_points)  # cut out light (fully transparent)
+    surface.blit(shadow_surface, (0, 0))
+
+def main():
+    pygame.mouse.set_visible(False)
+    pygame.event.set_grab(True)
+
+    running = True
+    while running:
+        dt = clock.tick(60) / 1000
+
+        for e in pygame.event.get():
+            if e.type == pygame.QUIT:
+                running = False
+
+        keys = pygame.key.get_pressed()
+        mx, my = pygame.mouse.get_rel()
+
+        entity['rotation'] = (entity['rotation'] + mx * 0.3) % 360 # type: ignore
+
+        move_dx = 0
+        move_dy = 0
+        if keys[pygame.K_w]: move_dy -= 1
+        if keys[pygame.K_s]: move_dy += 1
+        if keys[pygame.K_a]: move_dx -= 1
+        if keys[pygame.K_d]: move_dx += 1
+
+        length = math.hypot(move_dx, move_dy)
+        if length > 0:
+            move_dx /= length
+            move_dy /= length
+
+        entity['x'] += move_dx * entity['speed'] * dt # type: ignore
+        entity['y'] += move_dy * entity['speed'] * dt # type: ignore
+
+        resolve_collision(entity, DEV_GRASS_PLAIN, TILE_SIZE)
+
+        cam_x, cam_y = entity['x'], entity['y']
+
+        screen.fill((30, 30, 30))
+        draw_tilemap(screen, DEV_GRASS_PLAIN, TILE_SIZE, cam_x, cam_y)
+        draw_player(screen, entity, cam_x, cam_y)
+        draw_shadows(screen, entity, DEV_GRASS_PLAIN, TILE_SIZE, cam_x, cam_y)
+        pygame.display.flip()
+
+    pygame.quit()
+
+if __name__ == "__main__":
+    main()
